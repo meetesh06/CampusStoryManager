@@ -1,17 +1,46 @@
 import React from 'react';
-import { Picker, FlatList, TextInput, ScrollView, KeyboardAvoidingView, TouchableOpacity, Text, View, Platform, Image } from 'react-native';
+import { Alert, FlatList, TextInput, ScrollView, KeyboardAvoidingView, TouchableOpacity, Text, View, Platform, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather'
 import axios from 'axios';
 import FastImage from 'react-native-fast-image';
+import DateTimePicker from 'react-native-modal-datetime-picker';
 
 class createEventScreen extends React.Component {
+    constructor(props) {
+        super(props);
+        this.valid = this.valid.bind(this);
+        this.handleCreateEvent = this.handleCreateEvent.bind(this);
+    }
     state = {
         title: '',
         description: '',
         location: '',
         category: '',
-        categories: []
+        categories: [],
+        isDateTimePickerVisible: false,
+        reg_start: '',
+        reg_end: '',
+        picker: '',
+        date: '',
+        time: '',
+        contact_details: '',
+        faq: '',
+        price: '',
+        available_seats: ''
     }
+    _showDateTimePicker = (picker) => this.setState({ isDateTimePickerVisible: true, picker });
+ 
+    _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+    
+    _handleDatePicked = (val) => {
+        this.setState({ [this.state.picker]: val });
+        this._hideDateTimePicker();
+    }
+
+    handleCreateEvent = () => {
+        if(!this.valid()) return;
+    }
+
     componentDidMount() {
         formData = new FormData();
 		formData.append("dummy", "");
@@ -34,6 +63,55 @@ class createEventScreen extends React.Component {
 			// if(this.mounted)
 				this.setState({ refreshing: false });
 		  } )
+    }
+
+    valid = () => {
+        if(this.state.title.length < 5) {
+            Alert.alert("Invalid Title");
+            return false;
+        }
+        if(this.state.description.length < 5) {
+            Alert.alert("Invalid Description");
+            return false;
+        }
+        if(this.state.location.length < 3) {
+            Alert.alert("Invalid Location");
+            return false;
+        }
+        if(this.state.category === "") {
+            Alert.alert("Invalid Category");
+            return false;
+        }
+        if(this.state.reg_start === "") {
+            Alert.alert("Invalid Registration Start Date");
+            return false;
+        }
+        if(this.state.reg_end === "") {
+            Alert.alert("Invalid Registration End Date");
+            return false;
+        }
+        if(this.state.date === "") {
+            Alert.alert("Invalid Event Date");
+            return false;
+        }
+        if(this.state.time === "") {
+            Alert.alert("Invalid Event Time");
+            return false;
+        }
+        if(this.state.contact_details === "") {
+            Alert.alert("Invalid Contact Details");
+            return false;
+        }
+        if(!parseInt(this.state.price)) {
+            Alert.alert("Price must be a number");
+            return false;
+        }
+        if(!parseInt(this.state.available_seats)) {
+            Alert.alert("Available Seats must be a number");
+            return false;
+        }
+        
+        return true;
     }
     render() {
         return(
@@ -171,16 +249,187 @@ class createEventScreen extends React.Component {
                                 </TouchableOpacity>
                             }
                         />
-
+                        <TouchableOpacity 
+                            style={{
+                                backgroundColor: "#3f51b5",
+                                margin: 10,
+                                borderRadius: 10,
+                                padding: 10
+                            }}
+                            onPress={() => this._showDateTimePicker("date")}
+                        >
+                            <Text
+                                style={{
+                                    textAlign: 'center',
+                                    fontFamily: 'Roboto-Light',
+                                    fontSize: 20,
+                                    color: "#fff"
+                                }}
+                            >{this.state.date === "" ? "Event Date" : this.state.date + ""}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={{
+                                backgroundColor: "#3f51b5",
+                                margin: 10,
+                                borderRadius: 10,
+                                padding: 10
+                            }}
+                            onPress={() => this._showDateTimePicker("time")}
+                        >
+                            <Text
+                                style={{
+                                    textAlign: 'center',
+                                    fontFamily: 'Roboto-Light',
+                                    fontSize: 20,
+                                    color: "#fff"
+                                }}
+                            >{this.state.time === "" ? "Event Time" : this.state.time + ""}</Text>
+                        </TouchableOpacity>
                         <View
                             style={{
-                                height: 150
+                                margin: 5,
+                                flex: 1,
+                                // height: 150,
+                                borderRadius: 10,
+                                backgroundColor: '#f0f0f0'
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    textAlign: 'center',
+                                    margin: 15,
+                                    fontFamily: 'Roboto'
+                                }}
+                            >
+                                Registration Dates
+                            </Text>
+                            <TouchableOpacity 
+                                style={{
+                                    backgroundColor: "#2e7d32",
+                                    margin: 10,
+                                    borderRadius: 10,
+                                    padding: 10
+                                }}
+                                onPress={() => this._showDateTimePicker("reg_start")}
+                            >
+                                <Text
+                                    style={{
+                                        textAlign: 'center',
+                                        fontFamily: 'Roboto-Light',
+                                        fontSize: 20,
+                                        color: "#fff"
+                                    }}
+                                >{this.state.reg_start === "" ? "Start Date" : this.state.reg_start + ""}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                                style={{
+                                    backgroundColor: "#dd2c00",
+                                    margin: 10,
+                                    borderRadius: 10,
+                                    padding: 10
+                                }}
+                                onPress={() => this._showDateTimePicker("reg_end")}
+                            >
+                                <Text
+                                    style={{
+                                        textAlign: 'center',
+                                        fontFamily: 'Roboto-Light',
+                                        fontSize: 20,
+                                        color: "#fff"
+                                    }}
+                                >{this.state.reg_end === "" ? "End Date" : this.state.reg_end + ""}</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <TextInput
+                            multiline={true}
+                            numberOfLines={5}
+                            style={{
+                                padding: 10, 
+                                fontSize: 20, 
+                                backgroundColor: '#f9f5ed', 
+                                borderRadius: 10, 
+                                marginTop: 10,
+                                minHeight: 80
+                            }}
+                            onChangeText={(contact_details) => this.setState({contact_details})}
+                            value={this.state.contact_details}
+                            autoCapitalize={"none"}
+                            placeholder="Contact Details"
+                        />
+                        <TextInput
+                            multiline={true}
+                            numberOfLines={5}
+                            style={{
+                                padding: 10, 
+                                fontSize: 20, 
+                                backgroundColor: '#f9f5ed', 
+                                borderRadius: 10, 
+                                marginTop: 10,
+                                minHeight: 80
+                            }}
+                            onChangeText={(faq) => this.setState({faq})}
+                            value={this.state.faq}
+                            autoCapitalize={"none"}
+                            placeholder="Frequently Asked Questions"
+                        />
+                        <TextInput
+                            style={{ padding: 10, fontSize: 20, backgroundColor: '#f9f5ed', borderRadius: 10, marginTop: 10 }}
+                            onChangeText={(price) => this.setState({price})}
+                            value={this.state.price}
+                            autoCapitalize={"none"}
+                            placeholder="Event Price"
+                        />
+                        <TextInput
+                            style={{ padding: 10, fontSize: 20, backgroundColor: '#f9f5ed', borderRadius: 10, marginTop: 10 }}
+                            onChangeText={(available_seats) => this.setState({available_seats})}
+                            value={this.state.available_seats}
+                            autoCapitalize={"none"}
+                            placeholder="Available Seats"
+                        />
+                        <TouchableOpacity 
+                            // disabled={!this.valid()}
+                            style={{
+                                backgroundColor: "red",
+                                // margin: 10,
+                                borderRadius: 10,
+                                padding: 10
+                            }}
+                            onPress={() => Alert.alert(
+                                'Create Event',
+                                'Are you sure you want to create this event ?',
+                                [
+                                  {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                                  {text: 'OK', onPress: () => this.handleCreateEvent()},
+                                ],
+                                { cancelable: false }
+                              )}
+                        >
+                            <Text
+                                style={{
+                                    textAlign: 'center',
+                                    fontFamily: 'Roboto',
+                                    fontSize: 20,
+                                    color: "#fff"
+                                }}
+                            >
+                                CREATE EVENT
+                            </Text>
+                        </TouchableOpacity>
+                        <View
+                            style={{
+                                height: 10
                             }}
                         >
 
                         </View>
                     </ScrollView>
                 </KeyboardAvoidingView>
+                <DateTimePicker
+                    isVisible={this.state.isDateTimePickerVisible}
+                    mode={ this.state.picker === "time" ? "time" : "date" }
+                    onConfirm={this._handleDatePicked}
+                    onCancel={this._hideDateTimePicker}
+                />
             </View>
         );
     }
