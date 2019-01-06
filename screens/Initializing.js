@@ -1,5 +1,5 @@
 import React from 'react';
-import { KeyboardAvoidingView, TextInput, ScrollView, TouchableOpacity, View, Text, Image, AsyncStorage, ActivityIndicator } from 'react-native';
+import { Alert, KeyboardAvoidingView, TextInput, ScrollView, TouchableOpacity, View, Text, Image, AsyncStorage, ActivityIndicator } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 // import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import AnimatedImageButton from '../components/Button';
@@ -18,7 +18,6 @@ const EMAIL = Constants.EMAIL;
 class App extends React.Component {
     async componentDidMount() {
         try {
-            // goHome();
           const status = await AsyncStorage.getItem(SET_UP_STATUS);
           if (status === "true") {
             goHome();
@@ -90,7 +89,6 @@ class App extends React.Component {
 					Alert.alert(
 						"'An unknown error occured',"
 					);
-					this.setState({ loading: false });
 			  }
 			
 		  })
@@ -99,8 +97,10 @@ class App extends React.Component {
 			  	Alert.alert(
 					err.toString()
 				)
-				this.setState({ loading: false });
-			})
+            })
+            .finally( () => {
+                this.setState({ loading: false });
+            });
     }
 
     continueNext = () => {
@@ -114,6 +114,10 @@ class App extends React.Component {
                     <View style={{ flex: 1, justifyContent: 'center', alignContent: 'center' }}>
                         <Image source={require('../media/LogoWhite.png')} style={{ width: 100, height: 100, resizeMode: 'contain', alignSelf: 'center' }} />
                         <Text style={{ marginTop: 20, fontFamily: 'Roboto-Regular', textAlign: 'center', color: '#fff', fontSize: 25 }}>Enter Login Details</Text>
+                        {
+                            this.state.loading &&
+                            <ActivityIndicator style={{ padding: 20 }} size="small" color="#fff" />
+                        }
                     </View>
                         <KeyboardAvoidingView behavior="padding" style={{ flex: 1, marginBottom: 35, paddingBottom: 10, backgroundColor: '#fff', borderRadius: 10, marginLeft: 10, marginRight: 10, paddingTop: 0, paddingLeft: 10, paddingRight: 10 }}>  
                                 
@@ -138,10 +142,6 @@ class App extends React.Component {
 
                             <View style={{ position: 'absolute', bottom: 5, flex: 1, left: 0, right: 0, marginTop: 20, backgroundColor: this.validData() ? '#553fff' : '#c0c0c0', borderRadius: 10, margin: 10 }}>
                                 <TouchableOpacity disabled={this.state.loading} onPress={this.handleLogin}>
-                                    {
-                                        this.state.loading &&
-                                        <ActivityIndicator style={{ padding: 20 }} size="small" color="#fff" />
-                                    }
                                     {
                                         !this.state.loading &&
                                         <Text style={{ color: '#fff', fontFamily: 'Roboto-Regular', fontSize: 20, textAlign: 'center', padding: 20}}>

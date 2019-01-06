@@ -12,7 +12,7 @@ import com.facebook.soloader.SoLoader;
 import com.reactnativenavigation.NavigationApplication;
 import com.reactnativenavigation.react.NavigationReactNativeHost;
 import com.reactnativenavigation.react.ReactGateway;
-
+import com.imagepicker.ImagePickerPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +31,7 @@ import com.dylanvann.fastimage.FastImageViewPackage;
 //    protected List<ReactPackage> getPackages() {
 //      return Arrays.<ReactPackage>asList(
 //          new MainReactPackage(),
-            new VectorIconsPackage()
+//            new VectorIconsPackage()
 //      );
 //    }
 //
@@ -52,9 +52,27 @@ import com.dylanvann.fastimage.FastImageViewPackage;
 //    SoLoader.init(this, /* native exopackage */ false);
 //  }
 //}
+import com.imagepicker.permissions.OnImagePickerPermissionsCallback; // <- add this import
+import com.facebook.react.modules.core.PermissionListener; // <- add this import
 
-public class MainApplication extends NavigationApplication {
+public class MainApplication extends NavigationApplication implements OnImagePickerPermissionsCallback {
+    private PermissionListener listener; // <- add this attribute
 
+    @Override
+                public void setPermissionListener(PermissionListener listener)
+                {
+                this.listener = listener;
+                }
+
+                @Override
+                public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+                {
+                if (listener != null)
+                {
+                listener.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                }
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                }
             @Override
     protected ReactGateway createReactGateway() {
             ReactNativeHost host = new NavigationReactNativeHost(this, isDebug(), createAdditionalReactPackages()) {
@@ -75,8 +93,10 @@ public class MainApplication extends NavigationApplication {
      // Add additional packages you require here
             // No need to add RnnPackage and MainReactPackage
                        return Arrays.<ReactPackage>asList(
-                                new LinearGradientPackage()
+                                 new LinearGradientPackage()
+                                ,new VectorIconsPackage()
                                 ,new FastImageViewPackage()
+                                ,new ImagePickerPackage()
                     );
         }
 

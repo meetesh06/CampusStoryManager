@@ -1,21 +1,31 @@
 import React from 'react';
-import { Alert, FlatList, TextInput, ScrollView, KeyboardAvoidingView, TouchableOpacity, Text, View, Platform, Image } from 'react-native';
+import { AsyncStorage, Alert, FlatList, TextInput, ScrollView, KeyboardAvoidingView, TouchableOpacity, Text, View, Platform, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather'
 import axios from 'axios';
 import FastImage from 'react-native-fast-image';
 import DateTimePicker from 'react-native-modal-datetime-picker';
+import ImagePicker from 'react-native-image-picker';
+import Constants from '../constants';
+import { Navigation } from 'react-native-navigation'
 
+const TOKEN = Constants.TOKEN;
+
+const options = {
+    title: 'Select Event Poster',
+};
 class createEventScreen extends React.Component {
     constructor(props) {
         super(props);
         this.valid = this.valid.bind(this);
         this.handleCreateEvent = this.handleCreateEvent.bind(this);
+        this.openImagePicker = this.openImagePicker.bind(this);
     }
     state = {
         title: '',
         description: '',
         location: '',
         category: '',
+        tags: '',
         categories: [],
         isDateTimePickerVisible: false,
         reg_start: '',
@@ -26,8 +36,33 @@ class createEventScreen extends React.Component {
         contact_details: '',
         faq: '',
         price: '',
-        available_seats: ''
+        available_seats: '',
+        image: null,
+        response: null
     }
+
+    openImagePicker = () => {
+        ImagePicker.showImagePicker(options, (response) => {
+            console.log('Response = ', response);
+          
+            if (response.didCancel) {
+              console.log('User cancelled image picker');
+            } else if (response.error) {
+              console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+              console.log('User tapped custom button: ', response.customButton);
+            } else {
+              const source = { uri: response.uri };
+              // You can also display the image using data:
+              // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+              this.setState({
+                image: source,
+                response
+              });
+            }
+          });
+    }
+
     _showDateTimePicker = (picker) => this.setState({ isDateTimePickerVisible: true, picker });
  
     _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
@@ -37,8 +72,54 @@ class createEventScreen extends React.Component {
         this._hideDateTimePicker();
     }
 
-    handleCreateEvent = () => {
+    handleCreateEvent = async () => {
         if(!this.valid()) return;
+        this.setState({ loading: true });
+        const formData = new FormData();
+        formData.append("title", this.state.title);
+        formData.append("description", this.state.description);
+        formData.append("location", this.state.location);
+        formData.append("category", this.state.category);
+        formData.append("tags", this.state.tags);
+        formData.append("reg_start", this.state.reg_start + "");
+        formData.append("reg_end", this.state.reg_end + "");
+        formData.append("date", this.state.date + "");
+        formData.append("time", this.state.time + "");
+        formData.append("contact_details", this.state.contact_details);
+        formData.append("faq", this.state.faq);
+        formData.append("price", this.state.price);
+        formData.append("available_seats", this.state.available_seats);
+        const response = this.state.response;
+        formData.append("file", { 
+            uri: response.uri,
+            type: response.type,
+            name: response.fileName 
+        });
+
+        axios.post("https://www.mycampusdock.com/events/manager/create", formData, {
+			headers: {
+			  'Content-Type': 'multipart/form-data',
+			//   'Accept': 'application/json',
+			  'x-access-token': await AsyncStorage.getItem(TOKEN)
+			}
+		  })
+		  .then( (result) => {
+                result = result.data;
+                console.log(result);
+                if(!result.error) {
+                    Navigation.pop(this.props.componentId);
+                    Alert.alert("Event Created successfully");
+                } else {
+                }
+                this.setState({ loading: false });
+		  })
+		  .catch( (err) => {
+			  	console.log("DOPE ", err);
+			  	Alert.alert(
+					err.toString()
+				)
+				this.setState({ loading: false });
+			})
     }
 
     componentDidMount() {
@@ -111,49 +192,48 @@ class createEventScreen extends React.Component {
             return false;
         }
         
+        if(this.state.image === null) {
+            Alert.alert("Please select a valid poster");
+            return false;
+        }
+        
         return true;
     }
     render() {
         return(
-            <View style={{ flex: 1 }}>
-                <View elevation={5} 
-                    style = {{ 
-                        backgroundColor : '#fff', 
-                        minHeight : Platform.OS === 'android' ? 70 : 90, 
-                        paddingTop : Platform.OS === 'android'? 8 : 30, 
-                        // shadowColor: "#000000",
-                        // shadowOpacity: 0.1,
-                        // shadowRadius: 0.5,
-                        // shadowOffset: {
-                        //     height: 2,
-                        //     width: 2
-                        // }
-                }}>
-                    <Text
-                        style={{ 
-                            fontFamily: 'Roboto-Light',
-                            textAlign: 'center',
-                            flex: 1,
-                            marginTop: 20,
-                            fontSize: 35
-                         }}
+            <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                <KeyboardAvoidingView behavior={ Platform.OS === 'android' ? "" : "padding" } style={{ flex: 1, marginBottom : Platform.OS === 'android' ? 0 : 35, paddingBottom: 10, backgroundColor: '#fff', borderRadius: 10, marginLeft: 10, marginRight: 10, paddingTop: 0, paddingLeft: 10, paddingRight: 10 }}> 
+                    <ScrollView
+                        keyboardShouldPersistTaps='handled'
                     >
-                        Create a new Event
-                    </Text>
-                </View>
-                <Image style={{ 
-                    borderRadius: 10,
-                    margin: 5, 
-                    alignSelf: 'center', 
-                    width: 200, 
-                    height: 150 }} 
-                    source={require('../media/event.jpg')} 
-                />
+                        {
+                    this.state.image === null && 
+                    <Image style={{ 
+                        borderRadius: 10,
+                        margin: 5, 
+                        alignSelf: 'center', 
+                        width: 200, 
+                        height: 150 }} 
+                        source={require('../media/event.jpg')} 
+                    />
+                }
+                {
+                    this.state.image !== null && 
+                    <Image style={{ 
+                        borderRadius: 10,
+                        margin: 5, 
+                        alignSelf: 'center', 
+                        width: 200, 
+                        height: 150 }} 
+                        source={{ uri: this.state.image.uri }} 
+                    />
+                }
                 <TouchableOpacity 
                     style={{
                         flexDirection: 'row',
                         justifyContent: 'center'
                     }}
+                    onPress={this.openImagePicker}
                 >
                     <Text
                         style={{
@@ -167,10 +247,6 @@ class createEventScreen extends React.Component {
                     <Icon size={15} name="edit" />
                     
                 </TouchableOpacity>
-                <KeyboardAvoidingView behavior="padding" style={{ flex: 1, marginBottom: 35, paddingBottom: 10, backgroundColor: '#fff', borderRadius: 10, marginLeft: 10, marginRight: 10, paddingTop: 0, paddingLeft: 10, paddingRight: 10 }}> 
-                    <ScrollView
-                        keyboardShouldPersistTaps='handled'
-                    >
                         <TextInput
                             style={{ padding: 10, fontSize: 20, backgroundColor: '#f9f5ed', borderRadius: 10, marginTop: 10 }}
                             onChangeText={(title) => this.setState({title})}
@@ -387,11 +463,12 @@ class createEventScreen extends React.Component {
                             placeholder="Available Seats"
                         />
                         <TouchableOpacity 
-                            // disabled={!this.valid()}
+                            disabled={this.state.loading}
                             style={{
-                                backgroundColor: "red",
+                                backgroundColor: this.state.loading ? "#c0c0c0" : "red",
                                 // margin: 10,
                                 borderRadius: 10,
+                                marginTop: 15,
                                 padding: 10
                             }}
                             onPress={() => Alert.alert(
