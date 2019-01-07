@@ -5,7 +5,7 @@ import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
 import Constants from '../constants';
 import { Navigation } from 'react-native-navigation'
-
+import RNVideoHelper from 'react-native-video-helper';
 const TOKEN = Constants.TOKEN;
 
 // const options = {
@@ -47,11 +47,20 @@ class postVideoScreen extends React.Component {
             } else if (response.customButton) {
               console.log('User tapped custom button: ', response.customButton);
             } else {
-              const source = { uri: response.uri };
               // You can also display the image using data:
               // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+                console.log(response);
+                let videoLocalUri = Platform.OS === 'android' ? response.path : response.origURL;
+                RNVideoHelper.compress(videoLocalUri, {
+                    startTime: 0, // optional, in seconds, defaults to 0
+                    endTime: 4, //  optional, in seconds, defaults to video duration
+                    quality: 'low', // default low, can be medium or high
+                }).progress(value => {
+                    console.log('progress', value); // Int with progress value from 0 to 1
+                }).then(compressedUri => {
+                    console.log('compressedUri', compressedUri); // String with path to temporary compressed video
+                });
               this.setState({
-                image: source,
                 response
               });
             }
