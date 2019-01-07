@@ -4,9 +4,13 @@ import { AsyncStorage, Alert, TextInput, ScrollView, KeyboardAvoidingView, Touch
 import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
 import Constants from '../constants';
-import { Navigation } from 'react-native-navigation'
+import { Navigation } from 'react-native-navigation';
 import FastImage from 'react-native-fast-image'
+import Video from 'react-native-video';
 import LinearGradient from 'react-native-linear-gradient';
+import RNVideoHelper from 'react-native-video-helper';
+// import RNFetchBlob from 'react-native-fetch-blob'
+
 const TOKEN = Constants.TOKEN;
 
 class addToStory extends React.Component {
@@ -15,6 +19,7 @@ class addToStory extends React.Component {
         this.valid = this.valid.bind(this);
         this.handleCreatePost = this.handleCreatePost.bind(this);
         this.openImagePicker = this.openImagePicker.bind(this);
+        this.handleModal = this.handleModal.bind(this);
     }
     state = {
         message: '',
@@ -35,10 +40,12 @@ class addToStory extends React.Component {
             } else if (response.customButton) {
                 console.log('User tapped custom button: ', response.customButton);
             } else {
+
                 this.setState({
                     response,
                     video
                 });
+
             }
           });
     }
@@ -110,6 +117,14 @@ class addToStory extends React.Component {
         
     }
 
+    handleModal = (err, data) => {
+        if(err) {
+            this.setState({ response: null });
+            return;
+        }
+        this.setState({ response: { videoUri: data }, video: true });
+    }
+
     valid = () => {
         if(this.state.image !== null) return true;
         if(this.state.message.length < 5) {
@@ -127,6 +142,19 @@ class addToStory extends React.Component {
                     <ScrollView
                         keyboardShouldPersistTaps='handled'
                     >
+                        
+                        {
+                            this.state.response !== null &&
+                            this.state.video === true &&
+                            <Video 
+                                source={{uri: this.state.response.uri }}
+                                style={{
+                                    flex: 1,
+                                    height: 300,
+                                    margin: 5,
+                                    borderRadius: 10
+                                }} />
+                        }
                         {
                             this.state.response !== null &&
                             this.state.video === false &&
@@ -199,6 +227,9 @@ class addToStory extends React.Component {
                                     onPress={
                                         () => this.openImagePicker({
                                             title: 'Select a video file',
+                                            videoQuality: 'medium',
+                                            allowsEditing: true,
+                                            durationLimit: 30,
                                             mediaType: 'video',
                                             storageOptions:{
                                                 skipBackup:true,

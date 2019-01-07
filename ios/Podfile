@@ -20,6 +20,9 @@ target 'CampusStoryManager' do
   # Pods for CampusStory
   pod 'react-native-fast-image', :path => '../node_modules/react-native-fast-image'
   pod 'SDWebImage/WebP'
+  pod 'react-native-video/VideoCaching', :path => '../node_modules/react-native-video/react-native-video.podspec'
+  # pod 'react-native-fetch-blob', :path => '../node_modules/react-native-fetch-blob'
+
   target 'CampusStoryManager-tvOSTests' do
     inherit! :search_paths
     # Pods for testing

@@ -19,6 +19,8 @@ import java.util.List;
 import com.BV.LinearGradient.LinearGradientPackage; // <--- This!
 import com.dylanvann.fastimage.FastImageViewPackage;
 import com.reactlibrary.RNVideoHelperPackage;
+import com.brentvatne.react.ReactVideoPackage;
+
 //public class MainApplication extends Application implements ReactApplication {
 //
 //  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
@@ -98,6 +100,7 @@ public class MainApplication extends NavigationApplication implements OnImagePic
                                 ,new FastImageViewPackage()
                                 ,new ImagePickerPackage()
                                 ,new RNVideoHelperPackage()
+                                ,new ReactVideoPackage()
                     );
         }
 

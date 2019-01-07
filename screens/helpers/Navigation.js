@@ -50,7 +50,9 @@ export const goHome = async () => {
                         selectedFontSize: 12,
                         text: 'Home',
                         icon: homeIcon,
-                        selectedIconColor: '#FF4A3F'
+                        iconColor: '#c0c0c0',
+                        textColor: '#c0c0c0',
+                        selectedIconColor: '#555'
                       }
                     }
                   }
@@ -67,7 +69,9 @@ export const goHome = async () => {
                   fontSize: 10,
                   selectedFontSize: 12,
                   icon: areaChartIcon,
-                  selectedIconColor: '#FF4A3F'
+                  iconColor: '#c0c0c0',
+                  textColor: '#c0c0c0',
+                  selectedIconColor: '#555'
                 }
               }
             },
@@ -81,7 +85,9 @@ export const goHome = async () => {
                   fontSize: 10,
                   selectedFontSize: 12,
                   icon: profileIcon,
-                  selectedIconColor: '#FF4A3F'
+                  iconColor: '#c0c0c0',
+                  textColor: '#c0c0c0',
+                  selectedIconColor: '#555'
                 },
                 topBar: {
                   visible: false

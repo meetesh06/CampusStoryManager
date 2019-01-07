@@ -4,13 +4,14 @@ import Home from "./screens/Home";
 import createEventScreen from "./screens/createEventScreen";
 import addToStory from "./screens/addToStory";
 import conductPollScreen from "./screens/conductPollScreen";
-// import postVideoScreen from "./screens/postVideoScreen";
+import videoModalScreen from "./screens/videoModalScreen";
 
 Navigation.registerComponent(`Initializing Screen`, () => Initializing);
 Navigation.registerComponent(`Home Screen`, () => Home);
 Navigation.registerComponent(`Create Event Screen`, () => createEventScreen);
 Navigation.registerComponent(`Add To Story Screen`, () => addToStory);
 Navigation.registerComponent(`Conduct Poll Screen`, () => conductPollScreen);
+Navigation.registerComponent(`Video Modal Screen`, () => videoModalScreen);
 // Navigation.registerComponent(`Post Video Screen`, () => postVideoScreen);
 
 Navigation.events().registerAppLaunchedListener(() => {
