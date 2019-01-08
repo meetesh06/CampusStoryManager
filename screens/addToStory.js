@@ -92,7 +92,7 @@ class addToStory extends React.Component {
                     name: response.fileName
                 });
                 // axios.post("https://www.mycampusdock.com/channels/manager/create-video-post", formData, {
-                axios.post("http://127.0.0.1:65534/channels/manager/create-video-post", formData, {
+                axios.post("https://www.mycampusdock.com/channels/manager/create-video-post", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 //   'Accept': 'application/json',
