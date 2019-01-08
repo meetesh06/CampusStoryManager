@@ -9,7 +9,6 @@ import FastImage from 'react-native-fast-image'
 import Video from 'react-native-video';
 import LinearGradient from 'react-native-linear-gradient';
 import RNVideoHelper from 'react-native-video-helper';
-// import RNFetchBlob from 'react-native-fetch-blob'
 
 const TOKEN = Constants.TOKEN;
 
@@ -40,7 +39,6 @@ class addToStory extends React.Component {
             } else if (response.customButton) {
                 console.log('User tapped custom button: ', response.customButton);
             } else {
-
                 this.setState({
                     response,
                     video
@@ -59,7 +57,11 @@ class addToStory extends React.Component {
         if( response === null ) {
             console.log("POST CREATION");
             axios.post("https://www.mycampusdock.com/channels/manager/create-post", formData, {
-			headers: {
+            onUploadProgress: function(progressEvent) {
+                var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
+                console.log(percentCompleted)
+                },              
+            headers: {
 			  'Content-Type': 'multipart/form-data',
 			//   'Accept': 'application/json',
 			  'x-access-token': await AsyncStorage.getItem(TOKEN)
@@ -83,35 +85,68 @@ class addToStory extends React.Component {
 				this.setState({ loading: false });
 			})
         } else {
-            formData.append("file", { 
-                uri: response.uri,
-                type: response.type,
-                name: response.fileName 
-            });
-            axios.post("https://www.mycampusdock.com/channels/manager/create-image-post", formData, {
-			headers: {
-			  'Content-Type': 'multipart/form-data',
-			//   'Accept': 'application/json',
-			  'x-access-token': await AsyncStorage.getItem(TOKEN)
-			}
-		  })
-		  .then( (result) => {
-                result = result.data;
-                console.log(result);
-                if(!result.error) {
-                    Navigation.pop(this.props.componentId);
-                    Alert.alert("Post(Image) Created successfully");
-                } else {
+            if(this.state.video) {
+                formData.append("file", { 
+                    uri: response.uri,
+                    type: response.type,
+                    name: response.fileName
+                });
+                // axios.post("https://www.mycampusdock.com/channels/manager/create-video-post", formData, {
+                axios.post("http://127.0.0.1:65534/channels/manager/create-video-post", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                //   'Accept': 'application/json',
+                    'x-access-token': await AsyncStorage.getItem(TOKEN)
                 }
-                this.setState({ loading: false });
-		  })
-		  .catch( (err) => {
-			  	console.log("DOPE ", err);
-			  	Alert.alert(
-					err.toString()
-				)
-				this.setState({ loading: false });
-			})
+                })
+                .then( (result) => {
+                    result = result.data;
+                    console.log(result);
+                    if(!result.error) {
+                        // Navigation.pop(this.props.componentId);
+                        // Alert.alert("Post(Video) Created successfully");
+                    } else {
+                    }
+                    this.setState({ loading: false });
+                })
+                .catch( (err) => {
+                        console.log("DOPE ", err);
+                        Alert.alert(
+                        err.toString()
+                    )
+                    this.setState({ loading: false });
+                })
+            } else {
+                formData.append("file", { 
+                    uri: response.uri,
+                    type: response.type,
+                    name: response.fileName 
+                });
+                axios.post("https://www.mycampusdock.com/channels/manager/create-image-post", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                //   'Accept': 'application/json',
+                    'x-access-token': await AsyncStorage.getItem(TOKEN)
+                }
+                })
+                .then( (result) => {
+                    result = result.data;
+                    console.log(result);
+                    if(!result.error) {
+                        Navigation.pop(this.props.componentId);
+                        Alert.alert("Post(Image) Created successfully");
+                    } else {
+                    }
+                    this.setState({ loading: false });
+                })
+                .catch( (err) => {
+                        console.log("DOPE ", err);
+                        Alert.alert(
+                        err.toString()
+                    )
+                    this.setState({ loading: false });
+                })
+            }
         }
         
         
@@ -148,6 +183,7 @@ class addToStory extends React.Component {
                             this.state.video === true &&
                             <Video 
                                 source={{uri: this.state.response.uri }}
+                                controls={true}
                                 style={{
                                     flex: 1,
                                     height: 300,
@@ -229,7 +265,7 @@ class addToStory extends React.Component {
                                             title: 'Select a video file',
                                             videoQuality: 'medium',
                                             allowsEditing: true,
-                                            durationLimit: 30,
+                                            durationLimit: 10,
                                             mediaType: 'video',
                                             storageOptions:{
                                                 skipBackup:true,
