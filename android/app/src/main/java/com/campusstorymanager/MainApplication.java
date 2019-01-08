@@ -1,6 +1,7 @@
 package com.campusstorymanager;
 
 import android.app.Application;
+import android.content.Intent;
 
 import com.facebook.react.ReactApplication;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -20,6 +21,7 @@ import com.BV.LinearGradient.LinearGradientPackage; // <--- This!
 import com.dylanvann.fastimage.FastImageViewPackage;
 import com.reactlibrary.RNVideoHelperPackage;
 import com.brentvatne.react.ReactVideoPackage;
+//import com.vydia.RNUploader.UploaderReactPackage;
 
 //public class MainApplication extends Application implements ReactApplication {
 //
@@ -56,6 +58,10 @@ import com.brentvatne.react.ReactVideoPackage;
 //}
 import com.imagepicker.permissions.OnImagePickerPermissionsCallback; // <- add this import
 import com.facebook.react.modules.core.PermissionListener; // <- add this import
+
+import net.alhazmy13.mediapicker.Video.VideoPicker;
+
+import static android.app.Activity.RESULT_OK;
 
 public class MainApplication extends NavigationApplication implements OnImagePickerPermissionsCallback {
     private PermissionListener listener; // <- add this attribute
@@ -101,6 +107,8 @@ public class MainApplication extends NavigationApplication implements OnImagePic
                                 ,new ImagePickerPackage()
                                 ,new RNVideoHelperPackage()
                                 ,new ReactVideoPackage()
+//                                ,new UploaderReactPackage()
+                                ,new MkaerVideoPickerPackage()
                     );
         }
 

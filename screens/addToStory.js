@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncStorage, Alert, TextInput, ScrollView, KeyboardAvoidingView, TouchableOpacity, Text, View, Platform, Image } from 'react-native';
+import { NativeModules, Dimensions, AsyncStorage, Alert, TextInput, ScrollView, KeyboardAvoidingView, TouchableOpacity, Text, View, Platform, Image } from 'react-native';
 // import Icon from 'react-native-vector-icons/Feather'
 import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
@@ -9,6 +9,9 @@ import FastImage from 'react-native-fast-image'
 import Video from 'react-native-video';
 import LinearGradient from 'react-native-linear-gradient';
 import RNVideoHelper from 'react-native-video-helper';
+import Upload from 'react-native-background-upload';
+import ProgressBarAnimated from 'react-native-progress-bar-animated';
+import reactNativeVideoHelper from 'react-native-video-helper';
 
 const TOKEN = Constants.TOKEN;
 
@@ -24,43 +27,78 @@ class addToStory extends React.Component {
         message: '',
         response: null,
         loading: false,
-        video: false
+        video: false,
+        progress: 0
     }
 
     openImagePicker = (options, video) => {
-        ImagePicker.launchImageLibrary(options, (response) => {
-            console.log('Response = ', response);
-          
-            if (response.didCancel) {
-                this.setState({ response: null, video })
-                console.log('User cancelled image picker');
-            } else if (response.error) {
-                console.log('ImagePicker Error: ', response.error);
-            } else if (response.customButton) {
-                console.log('User tapped custom button: ', response.customButton);
-            } else {
-                this.setState({
-                    response,
-                    video
-                });
+        if (Platform.OS === "android" && video) {
+            NativeModules.MkaerVideoPicker.openPicker()
+                .then((data) => {
+                    console.log(data);
+                    // Navigation.showModal({
+                    //     stack: {
+                    //       children: [{
+                    //         component: {
+                    //           name: 'Video Modal Screen',
+                    //           passProps: {
+                    //             uri,
+                    //             completed: this.completedEditing
+                    //           },
+                    //           options: {
+                    //             topBar: {
+                    //               title: {
+                    //                 text: 'Modal'
+                    //               }
+                    //             }
+                    //           }
+                    //         }
+                    //       }]
+                    //     }
+                    //   });
 
-            }
-          });
+                    // this.setState({
+                    //     response: { uri },
+                    //     video
+                    // });
+                    
+                })
+        } else {
+            ImagePicker.launchImageLibrary(options, (response) => {
+                console.log('Response = ', response);
+              
+                if (response.didCancel) {
+                    this.setState({ response: null, video })
+                    console.log('User cancelled image picker');
+                } else if (response.error) {
+                    console.log('ImagePicker Error: ', response.error);
+                } else if (response.customButton) {
+                    console.log('User tapped custom button: ', response.customButton);
+                } else {
+                    this.setState({
+                        response,
+                        video
+                    });
+    
+                }
+              });
+        }
     }
 
     handleCreatePost = async () => {
         if(!this.valid()) return;
         this.setState({ loading: true });
+        const context = this;
         const formData = new FormData();
-        formData.append("message", this.state.title);
+        formData.append("message", this.state.message);
         const response = this.state.response;
         if( response === null ) {
             console.log("POST CREATION");
             axios.post("https://www.mycampusdock.com/channels/manager/create-post", formData, {
             onUploadProgress: function(progressEvent) {
-                var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
-                console.log(percentCompleted)
-                },              
+                let percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
+                context.setState({ progress: percentCompleted });
+            },
             headers: {
 			  'Content-Type': 'multipart/form-data',
 			//   'Accept': 'application/json',
@@ -93,6 +131,10 @@ class addToStory extends React.Component {
                 });
                 // axios.post("https://www.mycampusdock.com/channels/manager/create-video-post", formData, {
                 axios.post("https://www.mycampusdock.com/channels/manager/create-video-post", formData, {
+                onUploadProgress: function(progressEvent) {
+                    let percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
+                    context.setState({ progress: percentCompleted });
+                },
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 //   'Accept': 'application/json',
@@ -103,8 +145,8 @@ class addToStory extends React.Component {
                     result = result.data;
                     console.log(result);
                     if(!result.error) {
-                        // Navigation.pop(this.props.componentId);
-                        // Alert.alert("Post(Video) Created successfully");
+                        Navigation.pop(this.props.componentId);
+                        Alert.alert("Post(Video) Created successfully");
                     } else {
                     }
                     this.setState({ loading: false });
@@ -116,6 +158,48 @@ class addToStory extends React.Component {
                     )
                     this.setState({ loading: false });
                 })
+                // const options = {
+                //     url: 'https://www.mycampusdock.com/channels/manager/create-video-post',
+                //     path: response.uri,
+                //     method: 'POST',
+                //     field: formData, // -- test this
+                //     type: 'multipart',
+                //     headers: {
+                //         'Content-Type': 'multipart/form-data',
+                //         'x-access-token': await AsyncStorage.getItem(TOKEN)
+                //     },
+                //     // Below are options only supported on Android
+                //     notification: {
+                //       enabled: true
+                //     }
+                //   }
+                  
+                //   Upload.startUpload(options).then((uploadId) => {
+                //     console.log('Upload started')
+                //     Upload.addListener('progress', uploadId, (data) => {
+                //       console.log(`Progress: ${data.progress}%`)
+                //     })
+                //     Upload.addListener('error', uploadId, (data) => {
+                //       console.log(`Error: ${data.error}%`)
+                //     })
+                //     Upload.addListener('cancelled', uploadId, (data) => {
+                //       console.log(`Cancelled!`)
+                //     })
+                //     Upload.addListener('completed', uploadId, (data) => {
+                //       // data includes responseCode: number and responseBody: Object
+                //       const result = JSON.parse(data.responseBody);
+                //       console.log(result);
+                //         // if(!result.error) {
+                //             // Navigation.pop(this.props.componentId);
+                //             // Alert.alert("Post(Video) Created successfully");
+                //         // } else {
+                //         // }
+                //         this.setState({ loading: false });
+                //     })
+                //   }).catch((err) => {
+                //     console.log('Upload error!', err)
+                //   })
+                  
             } else {
                 formData.append("file", { 
                     uri: response.uri,
@@ -123,6 +207,10 @@ class addToStory extends React.Component {
                     name: response.fileName 
                 });
                 axios.post("https://www.mycampusdock.com/channels/manager/create-image-post", formData, {
+                onUploadProgress: function(progressEvent) {
+                    let percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
+                    context.setState({ progress: percentCompleted });
+                },
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 //   'Accept': 'application/json',
@@ -171,6 +259,7 @@ class addToStory extends React.Component {
     }
 
     render() {
+        const barWidth = Dimensions.get('screen').width - 40;
         return(
             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                 <KeyboardAvoidingView behavior={ Platform.OS === 'android' ? "" : "padding" } style={{ flex: 1, marginBottom : Platform.OS === 'android' ? 0 : 35, paddingBottom: 10, backgroundColor: '#fff', borderRadius: 10, marginLeft: 10, marginRight: 10, paddingTop: 0, paddingLeft: 10, paddingRight: 10 }}> 
@@ -185,6 +274,7 @@ class addToStory extends React.Component {
                                 source={{uri: this.state.response.uri }}
                                 controls={true}
                                 style={{
+                                    backgroundColor: '#000',
                                     flex: 1,
                                     height: 300,
                                     margin: 5,
@@ -338,6 +428,17 @@ class addToStory extends React.Component {
                             autoCapitalize={"none"}
                             placeholder="Your message here"
                         />
+                        <View
+                            style={{
+                                marginTop: 15
+                            }}
+                        >
+                            <ProgressBarAnimated
+                                width={barWidth}
+                                value={this.state.progress}
+                                backgroundColorOnComplete="#6CC644"
+                            />
+                        </View>
                         <TouchableOpacity 
                             style={{
                                 backgroundColor: this.state.loading ? "#c0c0c0" : "red",
@@ -374,9 +475,9 @@ class addToStory extends React.Component {
                         >
 
                         </View>
+                        
                     </ScrollView>
                 </KeyboardAvoidingView>
-                
             </View>
         );
     }

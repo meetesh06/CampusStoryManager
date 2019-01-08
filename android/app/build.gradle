@@ -140,6 +140,7 @@ android {
         }
     }
 }
+//configurations.all { resolutionStrategy.force 'com.squareup.okhttp3:okhttp:3.4.1' } // required by react-native-background-upload until React Native supports okhttp >= okhttp 3.5
 
 dependencies {
     compile project(':react-native-vector-icons')
@@ -155,6 +156,13 @@ dependencies {
     compile project(':react-native-image-picker')
     compile project(':react-native-video-helper')
     compile project(':react-native-video')
+//    compile project(':react-native-background-upload')
+    implementation 'net.alhazmy13.MediaPicker:libary:2.4.4'
+//    implementation 'com.iceteck.silicompressorr:silicompressor:2.2.1'
+    implementation 'com.writingminds:FFmpegAndroid:0.3.2'
+
+
+
 }
 
 // Run this once to be able to run the application with BUCK
