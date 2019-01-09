@@ -25,6 +25,7 @@ import net.alhazmy13.mediapicker.Video.VideoPicker;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,8 +119,7 @@ public class MkaerVideoPicker extends ReactContextBaseJavaModule {
         int height = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
 
         String[] complexCommand = {"-ss", "" + start / 1000, "-y", "-i", this.uri, "-t", "" + (end - start) / 1000, "-s", width+"x"+height, "-r", "15", "-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", compressedUri };
-
-        this.execFFmpegBinary(complexCommand, Uri.parse(compressedUri).toString(), callback);
+        this.execFFmpegBinary(complexCommand, Uri.fromFile(new File(compressedUri)).toString(), callback);
     }
 
     private void execFFmpegBinary(String[] command, String uriCompressed, Callback callback){

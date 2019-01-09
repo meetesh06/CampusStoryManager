@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Intent;
 
 import com.facebook.react.ReactApplication;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -108,6 +109,7 @@ public class MainApplication extends NavigationApplication implements OnImagePic
                                 ,new RNVideoHelperPackage()
                                 ,new ReactVideoPackage()
 //                                ,new UploaderReactPackage()
+                                ,new RNFetchBlobPackage()
                                 ,new MkaerVideoPickerPackage()
                     );
         }

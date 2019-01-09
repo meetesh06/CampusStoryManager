@@ -11,6 +11,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import RNVideoHelper from 'react-native-video-helper';
 import ProgressBarAnimated from 'react-native-progress-bar-animated';
 import reactNativeVideoHelper from 'react-native-video-helper';
+import RNFetchBlob from 'rn-fetch-blob';
 
 const TOKEN = Constants.TOKEN;
 
@@ -31,7 +32,20 @@ class addToStory extends React.Component {
     }
 
     completedEditing = (err, data) => {
+        console.log("COMPLETED EDITING");
         if(err) return;
+        RNFetchBlob.fs.readStream(data, 'utf8')
+            .then((stream) => {
+                let data = ''
+                stream.open()
+                stream.onData((chunk) => {
+                    data += chunk
+                })
+                stream.onEnd(() => {
+                    console.log(data)
+                })
+            })
+            .catch(err => console.log(err))
         this.setState({
             response: { uri: data },
             video: true
@@ -125,28 +139,21 @@ class addToStory extends React.Component {
 			})
         } else {
             if(this.state.video) {
-                formData.append("file", { 
-                    uri: response.uri,
-                    type: "video/mp4",
-                    name: "Story"
-                });
+                if(Platform.OS === 'android') {
+                    formData.append("file", { 
+                        uri: response.uri,
+                        type: "video/mp4",
+                        name: "story"
+                    });
+                } else {
+                    formData.append("file", { 
+                        uri: response.uri,
+                        type: response.type,
+                        name: response.fileName
+                    });
+                }
                 // console.log(formData);
-                // formData.append("file", { 
-                //     uri: response.uri,
-                //     // type: response.type,
-                //     // name: response.fileName
-                // });
-                fetch("https://www.mycampusdock.com/channels/manager/create-video-post", {
-                    method: 'post',
-                    body: formData,
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    //   'Accept': 'application/json',
-                        'x-access-token': await AsyncStorage.getItem(TOKEN)
-                    }
-                }).then(res => {
-                    console.log(res)
-                }).catch(err => console.log(err))
+                
                 axios.post("https://www.mycampusdock.com/channels/manager/create-video-post", formData, {
                 onUploadProgress: function(progressEvent) {
                     let percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
@@ -220,6 +227,7 @@ class addToStory extends React.Component {
                 //   })
                   
             } else {
+                console.log(response);
                 formData.append("file", { 
                     uri: response.uri,
                     type: response.type,
