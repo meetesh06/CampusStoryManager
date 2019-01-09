@@ -22,6 +22,7 @@ import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedExceptio
 
 import net.alhazmy13.mediapicker.Video.VideoPicker;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -32,8 +33,9 @@ import static android.app.Activity.RESULT_OK;
 
 public class MkaerVideoPicker extends ReactContextBaseJavaModule {
     private ReactApplicationContext reactContext;
-    private Promise mPickerPromise;
+    private Promise mPickerPromise, mCompressPromise;
     private FFmpeg ffmpeg;
+    private String uri;
     private static final String E_PICKER = "PICKER_FAILED_TO_COMPLETE";
     private static final String E_COMPRESS = "FAILED_TO_COMPRESS";
 
@@ -44,7 +46,7 @@ public class MkaerVideoPicker extends ReactContextBaseJavaModule {
                 List<String> mPaths =  intent.getStringArrayListExtra(VideoPicker.EXTRA_VIDEO_PATH);
                 try {
                     // the uri
-                    String uri = mPaths.get(0);
+                    uri = mPaths.get(0);
                     MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                     // get duration
                     retriever.setDataSource(getCurrentActivity(), Uri.parse(uri));
@@ -106,10 +108,21 @@ public class MkaerVideoPicker extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void compress(final Promise promise) {
+    public void compress(Double start, Double end, Callback callback) {
+        String compressedUri = this.uri.substring(0, this.uri.length() - 4);
+        compressedUri = compressedUri + "compressed.mp4";
+
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(this.uri);
+        int width = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+        int height = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+
+        String[] complexCommand = {"-ss", "" + start / 1000, "-y", "-i", this.uri, "-t", "" + (end - start) / 1000, "-s", width+"x"+height, "-r", "15", "-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", compressedUri };
+
+        this.execFFmpegBinary(complexCommand, Uri.parse(compressedUri).toString(), callback);
     }
 
-    private void execFFmpegBinary(String[] command, String uriCompressed){
+    private void execFFmpegBinary(String[] command, String uriCompressed, Callback callback){
         try {
 
             ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
@@ -128,20 +141,33 @@ public class MkaerVideoPicker extends ReactContextBaseJavaModule {
                 @Override
                 public void onFailure(String message) {
                     Log.e("Event ", "onFailure - " + message);
+                    JSONObject data = new JSONObject();
+                    try {
+                        data.put("err", true);
+                        callback.invoke(data.toString());
 
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
                 public void onSuccess(String message) {
                     Log.e("Event ", "onSuccess - " + message);
+                    JSONObject data = new JSONObject();
+                    try {
+                        data.put("err", false);
+                        data.put("data", uriCompressed);
+                        callback.invoke(data.toString());
 
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
                 public void onFinish() {
                     Log.e("Event ", "onFinish");
-                    mPickerPromise.resolve(uriCompressed);
-
                 }
             });
         } catch (FFmpegCommandAlreadyRunningException e) {

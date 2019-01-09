@@ -1,15 +1,20 @@
 import React from 'react';
-import { View, TouchableOpacity, Platform, Image } from 'react-native';
+import { ScrollView, View, TouchableOpacity, Platform, Image } from 'react-native';
 import FastImage from 'react-native-fast-image'
 import { Navigation } from 'react-native-navigation'
 
 class Home extends React.Component {
+    // state = {
+    //     email: ''
+    // }
     state = {
         email: ''
-    }
+    };
+    
+    
     render() {
         return(
-            <View style={{ flex: 1, backgroundColor: '#fff' }}>
+            <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
                 <View elevation={5} 
                     style = {{ 
                         backgroundColor : '#fff', 
@@ -168,45 +173,10 @@ class Home extends React.Component {
                         />
 
                     </TouchableOpacity>
-                    {/* <TouchableOpacity
-                        style={{ 
-                            alignSelf: 'center',
-                            margin: 5,
-                            borderRadius: 10
-                        }}
-                        onPress={
-                            () => Navigation.push(this.props.componentId, {
-                                component: {
-                                  name: 'Post Video Screen',
-                                  options: {
-                                    topBar: {
-                                        drawBehind: false,
-                                        title: {
-                                            text: 'post a video'
-                                        },
-                                        visible: true
-                                    },
-                                    bottomTabs: { visible: false, drawBehind: true }
-                                  }
-                                }
-                              })
-                        }
-                    >
-                        <FastImage
-                            style={{ 
-                                alignSelf: 'center',
-                                width: 150, 
-                                height: 150,
-                                borderRadius: 10
-                            }}
-                            source={require('../media/postVideo.jpg')}
-                            resizeMode={FastImage.resizeMode.contain}
-                        />
-
-                    </TouchableOpacity> */}
+                    
 
                 </View>
-            </View>
+            </ScrollView>
         );
     }
 }

@@ -9,7 +9,6 @@ import FastImage from 'react-native-fast-image'
 import Video from 'react-native-video';
 import LinearGradient from 'react-native-linear-gradient';
 import RNVideoHelper from 'react-native-video-helper';
-import Upload from 'react-native-background-upload';
 import ProgressBarAnimated from 'react-native-progress-bar-animated';
 import reactNativeVideoHelper from 'react-native-video-helper';
 
@@ -21,7 +20,7 @@ class addToStory extends React.Component {
         this.valid = this.valid.bind(this);
         this.handleCreatePost = this.handleCreatePost.bind(this);
         this.openImagePicker = this.openImagePicker.bind(this);
-        this.handleModal = this.handleModal.bind(this);
+        this.completedEditing = this.completedEditing.bind(this);
     }
     state = {
         message: '',
@@ -31,42 +30,43 @@ class addToStory extends React.Component {
         progress: 0
     }
 
+    completedEditing = (err, data) => {
+        if(err) return;
+        this.setState({
+            response: { uri: data },
+            video: true
+        });
+    }
+
     openImagePicker = (options, video) => {
         if (Platform.OS === "android" && video) {
             NativeModules.MkaerVideoPicker.openPicker()
                 .then((data) => {
+                    data = JSON.parse(data);
                     console.log(data);
-                    // Navigation.showModal({
-                    //     stack: {
-                    //       children: [{
-                    //         component: {
-                    //           name: 'Video Modal Screen',
-                    //           passProps: {
-                    //             uri,
-                    //             completed: this.completedEditing
-                    //           },
-                    //           options: {
-                    //             topBar: {
-                    //               title: {
-                    //                 text: 'Modal'
-                    //               }
-                    //             }
-                    //           }
-                    //         }
-                    //       }]
-                    //     }
-                    //   });
-
-                    // this.setState({
-                    //     response: { uri },
-                    //     video
-                    // });
-                    
+                    Navigation.showModal({
+                        stack: {
+                          children: [{
+                            component: {
+                              name: 'Video Modal Screen',
+                              passProps: {
+                                uri: data.uri,
+                                completedEditing: this.completedEditing
+                              },
+                              options: {
+                                topBar: {
+                                  visible: false,
+                                  drawBehind: true
+                                }
+                              }
+                            }
+                          }]
+                        }
+                      });
                 })
         } else {
             ImagePicker.launchImageLibrary(options, (response) => {
-                console.log('Response = ', response);
-              
+                console.log('Response = ', response);              
                 if (response.didCancel) {
                     this.setState({ response: null, video })
                     console.log('User cancelled image picker');
@@ -75,6 +75,7 @@ class addToStory extends React.Component {
                 } else if (response.customButton) {
                     console.log('User tapped custom button: ', response.customButton);
                 } else {
+                    
                     this.setState({
                         response,
                         video
@@ -126,10 +127,26 @@ class addToStory extends React.Component {
             if(this.state.video) {
                 formData.append("file", { 
                     uri: response.uri,
-                    type: response.type,
-                    name: response.fileName
+                    type: "video/mp4",
+                    name: "Story"
                 });
-                // axios.post("https://www.mycampusdock.com/channels/manager/create-video-post", formData, {
+                // console.log(formData);
+                // formData.append("file", { 
+                //     uri: response.uri,
+                //     // type: response.type,
+                //     // name: response.fileName
+                // });
+                fetch("https://www.mycampusdock.com/channels/manager/create-video-post", {
+                    method: 'post',
+                    body: formData,
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    //   'Accept': 'application/json',
+                        'x-access-token': await AsyncStorage.getItem(TOKEN)
+                    }
+                }).then(res => {
+                    console.log(res)
+                }).catch(err => console.log(err))
                 axios.post("https://www.mycampusdock.com/channels/manager/create-video-post", formData, {
                 onUploadProgress: function(progressEvent) {
                     let percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
@@ -177,7 +194,8 @@ class addToStory extends React.Component {
                 //   Upload.startUpload(options).then((uploadId) => {
                 //     console.log('Upload started')
                 //     Upload.addListener('progress', uploadId, (data) => {
-                //       console.log(`Progress: ${data.progress}%`)
+                //     //   console.log(`Progress: ${data.progress}%`)
+                //         context.setState({ progress: data.progress });
                 //     })
                 //     Upload.addListener('error', uploadId, (data) => {
                 //       console.log(`Error: ${data.error}%`)
@@ -186,14 +204,15 @@ class addToStory extends React.Component {
                 //       console.log(`Cancelled!`)
                 //     })
                 //     Upload.addListener('completed', uploadId, (data) => {
-                //       // data includes responseCode: number and responseBody: Object
-                //       const result = JSON.parse(data.responseBody);
-                //       console.log(result);
-                //         // if(!result.error) {
-                //             // Navigation.pop(this.props.componentId);
-                //             // Alert.alert("Post(Video) Created successfully");
-                //         // } else {
-                //         // }
+                //         // data includes responseCode: number and responseBody: Object
+                //         const result = JSON.parse(data.responseBody);
+
+                //         console.log(result);
+                //         if(!result.error) {
+                //             Navigation.pop(this.props.componentId);
+                //             Alert.alert("Post(Video) Created successfully");
+                //         } else {
+                //         }
                 //         this.setState({ loading: false });
                 //     })
                 //   }).catch((err) => {
@@ -235,17 +254,7 @@ class addToStory extends React.Component {
                     this.setState({ loading: false });
                 })
             }
-        }
-        
-        
-    }
-
-    handleModal = (err, data) => {
-        if(err) {
-            this.setState({ response: null });
-            return;
-        }
-        this.setState({ response: { videoUri: data }, video: true });
+        }   
     }
 
     valid = () => {
@@ -355,7 +364,8 @@ class addToStory extends React.Component {
                                             title: 'Select a video file',
                                             videoQuality: 'medium',
                                             allowsEditing: true,
-                                            durationLimit: 10,
+                                            // durationLimit: 10,
+                                            durationLimit: 30,
                                             mediaType: 'video',
                                             storageOptions:{
                                                 skipBackup:true,
