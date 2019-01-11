@@ -53,6 +53,10 @@ export const goHome = async () => {
                         iconColor: '#c0c0c0',
                         textColor: '#c0c0c0',
                         selectedIconColor: '#555'
+                      },
+                      topBar: {
+                        visible: false,
+                        drawBehind: true,
                       }
                     }
                   }

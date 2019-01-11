@@ -36,6 +36,7 @@ import com.brentvatne.react.ReactVideoPackage;
 //    protected List<ReactPackage> getPackages() {
 //      return Arrays.<ReactPackage>asList(
 //          new MainReactPackage(),
+            new RNFetchBlobPackage(),
 //            new VectorIconsPackage()
 //      );
 //    }

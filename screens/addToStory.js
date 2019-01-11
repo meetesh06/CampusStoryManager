@@ -372,8 +372,7 @@ class addToStory extends React.Component {
                                             title: 'Select a video file',
                                             videoQuality: 'medium',
                                             allowsEditing: true,
-                                            // durationLimit: 10,
-                                            durationLimit: 30,
+                                            durationLimit: 10,
                                             mediaType: 'video',
                                             storageOptions:{
                                                 skipBackup:true,
