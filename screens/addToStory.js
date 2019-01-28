@@ -143,7 +143,7 @@ class addToStory extends React.Component {
                     formData.append("file", { 
                         uri: response.uri,
                         type: "video/mp4",
-                        name: "story"
+                        name: "story.mp4"
                     });
                 } else {
                     formData.append("file", { 
@@ -155,6 +155,7 @@ class addToStory extends React.Component {
                 // console.log(formData);
                 
                 axios.post("https://www.mycampusdock.com/channels/manager/create-video-post", formData, {
+                // axios.post("http://127.0.0.1:65534/channels/manager/create-video-post", formData, {
                 onUploadProgress: function(progressEvent) {
                     let percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
                     context.setState({ progress: percentCompleted });

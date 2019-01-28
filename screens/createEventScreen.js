@@ -84,7 +84,7 @@ class createEventScreen extends React.Component {
         formData.append("reg_start", this.state.reg_start + "");
         formData.append("reg_end", this.state.reg_end + "");
         formData.append("date", this.state.date + "");
-        formData.append("time", this.state.time + "");
+        formData.append("time", this.state.time.toString());
         formData.append("contact_details", this.state.contact_details);
         formData.append("faq", this.state.faq);
         formData.append("price", this.state.price);
