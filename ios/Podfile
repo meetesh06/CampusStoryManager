@@ -22,6 +22,7 @@ target 'CampusStoryManager' do
   pod 'SDWebImage/WebP'
   pod 'react-native-video/VideoCaching', :path => '../node_modules/react-native-video/react-native-video.podspec'
   # pod 'react-native-fetch-blob', :path => '../node_modules/react-native-fetch-blob'
+  pod 'RNFileViewer', :path => '../node_modules/react-native-file-viewer/ios'
 
   target 'CampusStoryManager-tvOSTests' do
     inherit! :search_paths

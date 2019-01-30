@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncStorage, Alert, FlatList, TextInput, ScrollView, KeyboardAvoidingView, TouchableOpacity, Text, View, Platform, Image } from 'react-native';
+import { Dimensions, AsyncStorage, Alert, FlatList, TextInput, ScrollView, KeyboardAvoidingView, TouchableOpacity, Text, View, Platform, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather'
 import axios from 'axios';
 import FastImage from 'react-native-fast-image';
@@ -7,7 +7,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import ImagePicker from 'react-native-image-picker';
 import Constants from '../constants';
 import { Navigation } from 'react-native-navigation'
-
+import ProgressBarAnimated from 'react-native-progress-bar-animated';
 const TOKEN = Constants.TOKEN;
 
 const options = {
@@ -38,19 +38,20 @@ class createEventScreen extends React.Component {
         price: '',
         available_seats: '',
         image: null,
-        response: null
+        response: null,
+        progress: 0
     }
 
     openImagePicker = () => {
         ImagePicker.showImagePicker(options, (response) => {
-            console.log('Response = ', response);
+            // console.log('Response = ', response);
           
             if (response.didCancel) {
-              console.log('User cancelled image picker');
+            //   console.log('User cancelled image picker');
             } else if (response.error) {
-              console.log('ImagePicker Error: ', response.error);
+            //   console.log('ImagePicker Error: ', response.error);
             } else if (response.customButton) {
-              console.log('User tapped custom button: ', response.customButton);
+            //   console.log('User tapped custom button: ', response.customButton);
             } else {
               const source = { uri: response.uri };
               // You can also display the image using data:
@@ -75,6 +76,7 @@ class createEventScreen extends React.Component {
     handleCreateEvent = async () => {
         if(!this.valid()) return;
         this.setState({ loading: true });
+        const context = this;
         const formData = new FormData();
         formData.append("title", this.state.title);
         formData.append("description", this.state.description);
@@ -97,15 +99,20 @@ class createEventScreen extends React.Component {
         });
 
         axios.post("https://www.mycampusdock.com/events/manager/create", formData, {
-			headers: {
+            onUploadProgress: function(progressEvent) {
+                let percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
+                context.setState({ progress: percentCompleted });
+            },
+            headers: {
 			  'Content-Type': 'multipart/form-data',
 			//   'Accept': 'application/json',
 			  'x-access-token': await AsyncStorage.getItem(TOKEN)
-			}
+            }
+            
 		  })
 		  .then( (result) => {
                 result = result.data;
-                console.log(result);
+                // console.log(result);
                 if(!result.error) {
                     Navigation.pop(this.props.componentId);
                     Alert.alert("Event Created successfully");
@@ -114,7 +121,7 @@ class createEventScreen extends React.Component {
                 this.setState({ loading: false });
 		  })
 		  .catch( (err) => {
-			  	console.log("DOPE ", err);
+			  	// console.log("DOPE ", err);
 			  	Alert.alert(
 					err.toString()
 				)
@@ -133,7 +140,7 @@ class createEventScreen extends React.Component {
 		  })
 		  .then( (result) => {
 			result = result.data;
-			console.log(result);
+			// console.log(result);
 			if(!result.error) {
                 
 				this.setState({ categories: result.data, category: result.data[0].value });
@@ -184,8 +191,10 @@ class createEventScreen extends React.Component {
             return false;
         }
         if(!parseInt(this.state.price)) {
-            Alert.alert("Price must be a number");
-            return false;
+            if(this.state.price !== "0") {
+                Alert.alert("Price must be a number");
+                return false;
+            }
         }
         if(!parseInt(this.state.available_seats)) {
             Alert.alert("Available Seats must be a number");
@@ -200,6 +209,7 @@ class createEventScreen extends React.Component {
         return true;
     }
     render() {
+        const barWidth = Dimensions.get('screen').width - 40;
         return(
             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                 <KeyboardAvoidingView behavior={ Platform.OS === 'android' ? "" : "padding" } style={{ flex: 1, marginBottom : Platform.OS === 'android' ? 0 : 35, paddingBottom: 10, backgroundColor: '#fff', borderRadius: 10, marginLeft: 10, marginRight: 10, paddingTop: 0, paddingLeft: 10, paddingRight: 10 }}> 
@@ -462,6 +472,17 @@ class createEventScreen extends React.Component {
                             autoCapitalize={"none"}
                             placeholder="Available Seats"
                         />
+                        <View
+                            style={{
+                                marginTop: 15
+                            }}
+                        >
+                            <ProgressBarAnimated
+                                width={barWidth}
+                                value={this.state.progress}
+                                backgroundColorOnComplete="#6CC644"
+                            />
+                        </View>
                         <TouchableOpacity 
                             disabled={this.state.loading}
                             style={{

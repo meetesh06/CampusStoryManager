@@ -143,8 +143,10 @@ android {
 //configurations.all { resolutionStrategy.force 'com.squareup.okhttp3:okhttp:3.4.1' } // required by react-native-background-upload until React Native supports okhttp >= okhttp 3.5
 
 dependencies {
+    compile project(':realm')
     compile project(':react-native-fetch-blob')
     compile project(':react-native-vector-icons')
+    compile project(':react-native-file-viewer')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules

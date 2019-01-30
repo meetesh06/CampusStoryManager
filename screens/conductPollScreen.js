@@ -15,7 +15,8 @@ class createPollScreen extends React.Component {
     }
     state = {
         message: '',
-        options: ["option 1", "option 2"],
+        currentOption: '',
+        options: ["Yes", "No"],
         loading: false
     }
 
@@ -173,9 +174,10 @@ class createPollScreen extends React.Component {
                                 onPress={
                                     () => {
                                         let options = [...this.state.options];
+                                        if(options.length === 4) return Alert.alert("can't have more than 4 options!");
+                                        if(this.state.currentOption === '') return;
                                         options.push(this.state.currentOption.replace (/,/g, ""));
                                         this.setState({ options, currentOption: '' });
-
                                     }
                                 }
                             >

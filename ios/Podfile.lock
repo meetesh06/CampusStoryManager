@@ -79,6 +79,8 @@ PODS:
     - React/Core
     - React/fishhook
     - React/RCTBlob
+  - RNFileViewer (1.0.1):
+    - React
   - SDWebImage/Core (4.4.3)
   - SDWebImage/GIF (4.4.3):
     - FLAnimatedImage (~> 1.0)
@@ -100,6 +102,7 @@ DEPENDENCIES:
   - React/RCTNetwork (from `../node_modules/react-native`)
   - React/RCTText (from `../node_modules/react-native`)
   - React/RCTWebSocket (from `../node_modules/react-native`)
+  - RNFileViewer (from `../node_modules/react-native-file-viewer/ios`)
   - SDWebImage/WebP
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -123,6 +126,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-fast-image"
   react-native-video:
     :path: "../node_modules/react-native-video/react-native-video.podspec"
+  RNFileViewer:
+    :path: "../node_modules/react-native-file-viewer/ios"
   yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -137,10 +142,11 @@ SPEC CHECKSUMS:
   React: 1fe0eb13d90b625d94c3b117c274dcfd2e760e11
   react-native-fast-image: cba3d9bf9c2cf8ddb643d887a686c53a5dd90a2c
   react-native-video: 44c6befbc1526283ca1919891fcebe4680feade4
+  RNFileViewer: c1b1bf58137c22913c15309d987cb16295c84617
   SDWebImage: c5594f1a19c48d526d321e548902b56b479cd508
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
   yoga: b1ce48b6cf950b98deae82838f5173ea7cf89e85
 
-PODFILE CHECKSUM: 4da098d8ddef3dac6f9ad9f21f0c92e52462f1e2
+PODFILE CHECKSUM: ad726046863b81479c580cc8b9b18c9a7c53d2ad
 
 COCOAPODS: 1.5.3
