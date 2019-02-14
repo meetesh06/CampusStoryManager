@@ -12,66 +12,43 @@ import ProgressBarAnimated from 'react-native-progress-bar-animated';
 import Constants from '../constants';
 const artImage = require('../media/topics/art.webp');
 // const hottestImage = require('../../media/topics/hot.webp');
-const calImage = require('../media/topics/cal.webp');
+const foodImage = require('../media/topics/food.webp');
 const musicImage = require('../media/topics/music.webp');
-const satImage = require('../media/topics/sat.webp');
 const sagImage = require('../media/topics/sag.webp');
 const dadImage = require('../media/topics/dad.webp');
-const fashionImage = require('../media/topics/fashion.webp');
-const photographyImage = require('../media/topics/photography.webp');
-const halImage = require('../media/topics/hal.webp');
+const funImage = require('../media/topics/fun.webp');
 const communityImage = require('../media/topics/community.webp');
 
 const categories = [
   {
-    title: 'Art',
-    value: 'art',
-    image: artImage
+    title: 'Food',
+    value: 'food',
+    image: foodImage
   },
   {
-    title: 'Career and Literature',
-    value: 'cal',
-    image: calImage
-  },
-  {
-    title: 'Music',
-    value: 'music',
+    title: 'Music and Dance',
+    value: 'mad',
     image: musicImage
   },
   {
-    title: 'Science and Tech',
-    value: 'sat',
-    image: satImage
-  },
-  {
-    title: 'Sports and Gaming',
-    value: 'sag',
-    image: sagImage
-  },
-  {
-    title: 'Dance and Drama',
-    value: 'dad',
+    title: 'Art',
+    value: 'art',
     image: dadImage
   },
   {
-    title: 'Fashion',
-    value: 'fashion',
-    image: fashionImage
-  },
-  {
-    title: 'Photography',
-    value: 'photography',
-    image: photographyImage
-  },
-  {
-    title: 'Health and Lifestyle',
-    value: 'hal',
-    image: halImage
-  },
-  {
-    title: 'Community',
-    value: 'community',
+    title: 'Society',
+    value: 'society',
     image: communityImage
+  },
+  {
+    title: 'Sports',
+    value: 'sports',
+    image: sagImage
+  },
+  {
+    title: 'Fun',
+    value: 'fun',
+    image: funImage
   }
 ];
 
