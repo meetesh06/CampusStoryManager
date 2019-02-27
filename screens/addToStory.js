@@ -110,6 +110,7 @@ class addToStory extends React.Component {
         if( response === null ) {
             console.log("POST CREATION");
             axios.post("https://www.mycampusdock.com/channels/manager/create-post", formData, {
+            //axios.post("http://127.0.0.1:65534/channels/manager/create-post", formData, {
             onUploadProgress: function(progressEvent) {
                 let percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
                 context.setState({ progress: percentCompleted });
@@ -155,14 +156,12 @@ class addToStory extends React.Component {
                 // console.log(formData);
                 
                 axios.post("https://www.mycampusdock.com/channels/manager/create-video-post", formData, {
-                // axios.post("http://127.0.0.1:65534/channels/manager/create-video-post", formData, {
                 onUploadProgress: function(progressEvent) {
                     let percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
                     context.setState({ progress: percentCompleted });
                 },
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                //   'Accept': 'application/json',
                     'x-access-token': await AsyncStorage.getItem(TOKEN)
                 }
                 })

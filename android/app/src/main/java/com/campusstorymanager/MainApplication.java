@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Intent;
 
 import com.facebook.react.ReactApplication;
+import com.cmcewen.blurview.BlurViewPackage;
 import io.realm.react.RealmReactPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -20,56 +21,19 @@ import com.imagepicker.ImagePickerPackage;
 
 import java.util.Arrays;
 import java.util.List;
-import com.BV.LinearGradient.LinearGradientPackage; // <--- This!
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.dylanvann.fastimage.FastImageViewPackage;
 import com.reactlibrary.RNVideoHelperPackage;
 import com.brentvatne.react.ReactVideoPackage;
-//import com.vydia.RNUploader.UploaderReactPackage;
-
-//public class MainApplication extends Application implements ReactApplication {
-//
-//  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
-//    @Override
-//    public boolean getUseDeveloperSupport() {
-//      return BuildConfig.DEBUG;
-//    }
-//
-//    @Override
-//    protected List<ReactPackage> getPackages() {
-//      return Arrays.<ReactPackage>asList(
-//          new MainReactPackage(),
-            // new RealmReactPackage(),
-            
-//            new VectorIconsPackage()
-//      );
-//    }
-//
-//    @Override
-//    protected String getJSMainModuleName() {
-//      return "index";
-//    }
-//  };
-//
-//  @Override
-//  public ReactNativeHost getReactNativeHost() {
-//    return mReactNativeHost;
-//  }
-//
-//  @Override
-//  public void onCreate() {
-//    super.onCreate();
-//    SoLoader.init(this, /* native exopackage */ false);
-//  }
-//}
-import com.imagepicker.permissions.OnImagePickerPermissionsCallback; // <- add this import
-import com.facebook.react.modules.core.PermissionListener; // <- add this import
+import com.imagepicker.permissions.OnImagePickerPermissionsCallback;
+import com.facebook.react.modules.core.PermissionListener;
 
 import net.alhazmy13.mediapicker.Video.VideoPicker;
 
 import static android.app.Activity.RESULT_OK;
 
 public class MainApplication extends NavigationApplication implements OnImagePickerPermissionsCallback {
-    private PermissionListener listener; // <- add this attribute
+    private PermissionListener listener;
 
     @Override
                 public void setPermissionListener(PermissionListener listener)
@@ -103,21 +67,19 @@ public class MainApplication extends NavigationApplication implements OnImagePic
     }
 
     protected List<ReactPackage> getPackages() {
-     // Add additional packages you require here
-            // No need to add RnnPackage and MainReactPackage
-                       return Arrays.<ReactPackage>asList(
-                                 new LinearGradientPackage()
-                                ,new VectorIconsPackage()
-                                ,new FastImageViewPackage()
-                                ,new ImagePickerPackage()
-                                ,new RNVideoHelperPackage()
-                                ,new ReactVideoPackage()
-//                                ,new UploaderReactPackage()
-                                ,new RNFetchBlobPackage()
-                                ,new MkaerVideoPickerPackage()
-                                ,new RNFileViewerPackage()
-                                ,new RealmReactPackage()
-                    );
+        return Arrays.<ReactPackage>asList(
+                    new LinearGradientPackage()
+                ,new VectorIconsPackage()
+                ,new FastImageViewPackage()
+                ,new ImagePickerPackage()
+                ,new RNVideoHelperPackage()
+                ,new ReactVideoPackage()
+                ,new BlurViewPackage()
+                ,new RNFetchBlobPackage()
+                ,new MkaerVideoPickerPackage()
+                ,new RNFileViewerPackage()
+                ,new RealmReactPackage()
+    );
         }
 
             @Override

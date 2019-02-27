@@ -7,10 +7,8 @@ import axios from 'axios';
 import Constants from '../constants';
 import Realm from '../realm';
 
-const WIDTH = Dimensions.get('window').width;
-const TOKEN = Constants.TOKEN;
 class AnalyticsScreen extends React.Component {
-    
+        
     constructor(props) {
         super(props);
         this.handleUpdateData = this.handleUpdateData.bind(this);

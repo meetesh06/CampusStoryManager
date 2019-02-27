@@ -34,6 +34,8 @@ PODS:
   - libwebp/webp (0.6.1)
   - React (0.57.8):
     - React/Core (= 0.57.8)
+  - react-native-blur (0.8.0):
+    - React
   - react-native-fast-image (5.1.2):
     - FLAnimatedImage
     - React
@@ -93,6 +95,7 @@ PODS:
 
 DEPENDENCIES:
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
+  - react-native-blur (from `../node_modules/react-native-blur`)
   - react-native-fast-image (from `../node_modules/react-native-fast-image`)
   - react-native-video/VideoCaching (from `../node_modules/react-native-video/react-native-video.podspec`)
   - React/Core (from `../node_modules/react-native`)
@@ -122,6 +125,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/Folly.podspec"
   React:
     :path: "../node_modules/react-native"
+  react-native-blur:
+    :path: "../node_modules/react-native-blur"
   react-native-fast-image:
     :path: "../node_modules/react-native-fast-image"
   react-native-video:
@@ -139,14 +144,15 @@ SPEC CHECKSUMS:
   Folly: c89ac2d5c6ab169cd7397ef27485c44f35f742c7
   glog: 1de0bb937dccdc981596d3b5825ebfb765017ded
   libwebp: 0f01098c6c17175391af621b2f14150f3ca16e16
-  React: 1fe0eb13d90b625d94c3b117c274dcfd2e760e11
-  react-native-fast-image: cba3d9bf9c2cf8ddb643d887a686c53a5dd90a2c
-  react-native-video: 44c6befbc1526283ca1919891fcebe4680feade4
-  RNFileViewer: c1b1bf58137c22913c15309d987cb16295c84617
+  React: adbac0757ce35e92fbd447ab98c810209d27d9b0
+  react-native-blur: cad4d93b364f91e7b7931b3fa935455487e5c33c
+  react-native-fast-image: ec7e5a2420a9e63cf9b2925fce7babc580ea8e05
+  react-native-video: afdbf53bb44a700d1dcfc679790710469571d0f9
+  RNFileViewer: 5047ecf40477339723cc08abd55b5ebcefcef4b5
   SDWebImage: c5594f1a19c48d526d321e548902b56b479cd508
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
-  yoga: b1ce48b6cf950b98deae82838f5173ea7cf89e85
+  yoga: 74cdf036c30820443b25ade59916236b1e95ee93
 
-PODFILE CHECKSUM: ad726046863b81479c580cc8b9b18c9a7c53d2ad
+PODFILE CHECKSUM: f6d90aee3bdd06408330f28e47e013b5a3aaa0fc
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.0

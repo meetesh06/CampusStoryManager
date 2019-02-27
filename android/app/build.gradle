@@ -102,6 +102,8 @@ android {
     }
 
     defaultConfig {
+        renderscriptTargetApi 23
+        renderscriptSupportModeEnabled true
         applicationId "com.campusstorymanager"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -155,6 +157,7 @@ android {
 //configurations.all { resolutionStrategy.force 'com.squareup.okhttp3:okhttp:3.4.1' } // required by react-native-background-upload until React Native supports okhttp >= okhttp 3.5
 
 dependencies {
+    compile project(':react-native-blur')
     compile project(':realm')
     compile project(':react-native-fetch-blob')
     compile project(':react-native-vector-icons')

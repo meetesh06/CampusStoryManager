@@ -1,11 +1,12 @@
 const constants = {
-    LOGIN_STATUS: 'login_status',
     SET_UP_STATUS: 'set_up_status',
-    COLLEGE: 'college',
-    INTERESTS: 'interests',
-    TOKEN: 'token',
-    EMAIL: 'email',
-    PASSWORD: 'password',
+    TOKEN : 'token',
+    LOGS : 'logs',
+    TRACKS : 'tracks',
+    CONFIG : 'config',
+    USER_DATA : 'user_data',
+    SESSION_ID : 'session_id',
+    APP_USAGE_TIME : 'app_usage_time'
 }
 
 export default constants;

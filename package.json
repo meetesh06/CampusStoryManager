@@ -5,7 +5,12 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
-    "android": "cd ./android && ./gradlew app:assembleDebug && ./gradlew installDebug"
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "iphone": "react-native run-ios --device",
+    "iphone-release": "react-native run-ios --configuration Release --device",
+    "ios-release": "react-native run-ios --configuration Release",
+    "android-release": "react-native run-android --variant=release"
   },
   "dependencies": {
     "@ptomasroos/react-native-multi-slider": "^1.0.0",
@@ -13,6 +18,7 @@
     "react": "16.6.3",
     "react-native": "0.57.8",
     "react-native-background-upload": "^5.0.0",
+    "react-native-blur": "^3.2.2",
     "react-native-fast-image": "^5.1.2",
     "react-native-fetch-blob": "^0.10.8",
     "react-native-file-viewer": "^1.0.12",

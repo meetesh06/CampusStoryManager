@@ -1,156 +1,135 @@
 import React from 'react';
-import { Alert, KeyboardAvoidingView, TextInput, ScrollView, TouchableOpacity, View, Text, Image, AsyncStorage, ActivityIndicator } from 'react-native';
+import {TextInput, TouchableOpacity, View, Text, Image, ActivityIndicator, StatusBar } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-// import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import AnimatedImageButton from '../components/Button';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import { Kohana } from 'react-native-textinput-effects';
 import axios from 'axios';
-// import { Navigation } from 'react-native-navigation'
+import Icon from 'react-native-vector-icons/Feather'
 import { goHome } from './helpers/Navigation';
-
 import Constants from '../constants';
-const SET_UP_STATUS = Constants.SET_UP_STATUS;
-const TOKEN = Constants.TOKEN;
-const PASSWORD = Constants.PASSWORD;
-const EMAIL = Constants.EMAIL;
+import urls from '../URLS';
+import SessionStore from '../SessionStore';
 
 class App extends React.Component {
-    async componentDidMount() {
-        try {
-          const status = await AsyncStorage.getItem(SET_UP_STATUS);
-          if (status === "true") {
-            goHome();
-          } else {
-            this.setState({ loading: false });
-          }
-        } catch (err) {
-          console.log('error: ', err)
-          this.setState({ loading: false });
-        }
-    }
-    updataStatusAndToken = async (token) => {
-		await AsyncStorage.setItem(TOKEN, token);
-		await AsyncStorage.setItem(SET_UP_STATUS, "true");
-		goHome();
-	}
-    // static options(passProps) {
-	// 	return {
-	// 	  topBar: {
-	// 		visible: false,
-	// 	  }
-	// 	};
-	// }
-    constructor(props) {
+    constructor(props){
         super(props);
-        this.continueNext = this.continueNext.bind(this);
-        this.validData = this.validData.bind(this);
-        this.updataStatusAndToken = this.updataStatusAndToken.bind(this);
-        this.state = {
-            login: false,
-            loading: true,
-            email: '',
-            password: ''
-        }
-    }
-    validData = () => {
-        return this.state.email !== "" && this.state.password != "";
     }
 
-    handleLogin = () => {
-        if(!this.validData() || this.state.loading) return;
-        const { email, password } = this.state;
+    state = {
+        loading: false,
+        email: '',
+        password: '',
+        error : ''
+    }
+
+    UNSAFE_componentWillMount(){
+        const val = new SessionStore().getValue(Constants.SET_UP_STATUS);
+        if(val === true){
+            goHome();
+        }
+    }
+
+    updataStatusAndToken = (token, data) => {
+        const store = new SessionStore();
+        store.putValue(Constants.TOKEN, token);
+        store.putValue(Constants.USER_DATA, data)
+        store.putValue(Constants.SET_UP_STATUS, true);
+        store.setValueBulk();
+		goHome();
+	}
+
+    validData = (email, password) => {
+        const re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+        const match = re.test(email);
+        return match && password.length > 5;
+    }
+
+    handleLogin = (email, password, loading) => {
+        if(loading) return;
+        this.setState({ loading: true, error : ''});
         const formData = new FormData();
-        const updataStatusAndToken = this.updataStatusAndToken;
-        formData.append(EMAIL, this.state.email);
-        formData.append(PASSWORD, this.state.password);
-        this.setState({ loading: true });
-        axios.post("https://www.mycampusdock.com/auth/manager/signin", formData, {
+        formData.append('email', email);
+        formData.append('password', password);
+
+        axios.post(urls.URL_SIGNIN, formData, {
 			headers: {
 			  'Content-Type': 'multipart/form-data',
-			//   'Accept': 'application/json',
-			//   'x-access-token': this.props.auth.user_token
 			}
-		  })
-		  .then( (result) => {
-				result = result.data;
-			  if(!result.error) {
-					try {
-						console.log(result);
-						updataStatusAndToken(result.token);
-					} catch (error) {
-						console.log(error);
-						Alert.alert(
-							"An unknown error occured"
-						)
-					}
-			  } else {
-					console.log("SERVER REPLY ERROR");
-					Alert.alert(
-						"'An unknown error occured',"
-					);
-			  }
-			
-		  })
-		  .catch( (err) => {
-			  	console.log("DOPE ", err);
-			  	Alert.alert(
-					err.toString()
-				)
-            })
-            .finally( () => {
-                this.setState({ loading: false });
-            });
+		  }).then((result) => {
+            if(!result.data.error){
+                this.setState({loading : false, error : ''}, ()=>{
+                    this.updataStatusAndToken(result.data.token, result.data.data);
+                });
+            } else {
+                this.setState({error : 'Wrong email or password', loading : false});
+            }
+		  }).catch((e)=>{
+            console.log(e);
+            this.setState({error : 'Check Your Internet', loading : false});
+          });
     }
 
     continueNext = () => {
         goHome();
     };
+
     render() {
+        const {
+            email, password, loading, error
+        } = this.state;
+        const enabled = this.validData(email, password);
         return(
             <View style={{ flex: 1 }}>
-                <LinearGradient style={{ flex: 1 }} colors={['#FF4A3F', '#FF6A15']}>
-                    
+            <StatusBar hidden />
+                <LinearGradient style={{ flex: 1 }} colors={['#514A9D', '#24C6DC']}>
                     <View style={{ flex: 1, justifyContent: 'center', alignContent: 'center' }}>
                         <Image source={require('../media/LogoWhite.png')} style={{ width: 100, height: 100, resizeMode: 'contain', alignSelf: 'center' }} />
-                        <Text style={{ marginTop: 20, fontFamily: 'Roboto-Regular', textAlign: 'center', color: '#fff', fontSize: 25 }}>Enter Login Details</Text>
-                        {
-                            this.state.loading &&
-                            <ActivityIndicator style={{ padding: 20 }} size="small" color="#fff" />
-                        }
-                    </View>
-                        <KeyboardAvoidingView behavior="padding" style={{ flex: 1, marginBottom: 35, paddingBottom: 10, backgroundColor: '#fff', borderRadius: 10, marginLeft: 10, marginRight: 10, paddingTop: 0, paddingLeft: 10, paddingRight: 10 }}>  
-                                
+                        <Text style={{ marginTop: 20, fontFamily: 'Roboto-Regular', textAlign: 'center', color: '#fff', fontSize: 25 }}>Creator's Studio</Text>
+                        <Text style={{ marginTop: 10, fontFamily: 'Roboto-Light', textAlign: 'center', color: '#fff', fontSize: 14 }}>Thinking BIG, Changing Lives</Text>
+                        
+                        <View style={{justifyContent : 'center', marginTop : 50}}>
+                            <View style={{flexDirection : 'row', margin : 10, marginBottom : 1,  backgroundColor : '#fff', borderRadius : 10, justifyContent : 'center', alignItems : 'center'}}>
                                 <TextInput
-                                    style={{ padding: 10, fontSize: 20, backgroundColor: '#f9f5ed', borderRadius: 10, marginTop: 10 }}
-                                    onChangeText={(email) => this.setState({email})}
-                                    value={this.state.email}
-                                    autoCapitalize={"none"}
-                                    textContentType="emailAddress"
-                                    placeholder="Email Address"
+                                    autoCapitalize = 'none'
+                                    keyboardType = 'email-address'
+                                    keyboardAppearance = 'dark'
+                                    style = {{flex : 1, fontSize : 18, margin : 15, color : '#222'}}
+                                    placeholder = 'E-mail ID'
+                                    placeholderTextColor = '#555'
+                                    value = {email}
+                                    onChangeText = {(val)=>this.setState({email : val})}
                                 />
-                                <TextInput
-                                    style={{ padding: 10, fontSize: 20, backgroundColor: '#f9f5ed', borderRadius: 10, marginTop: 10 }}
-                                    onChangeText={(password) => this.setState({password})}
-                                    value={this.state.password}
-                                    autoCapitalize={"none"}
-                                    textContentType="password"
-                                    secureTextEntry={true}
-                                    placeholder="Password"
-                                />
-                                
+                            </View>
 
-                            <View style={{ position: 'absolute', bottom: 5, flex: 1, left: 0, right: 0, marginTop: 20, backgroundColor: this.validData() ? '#553fff' : '#c0c0c0', borderRadius: 10, margin: 10 }}>
-                                <TouchableOpacity disabled={this.state.loading} onPress={this.handleLogin}>
-                                    {
-                                        !this.state.loading &&
-                                        <Text style={{ color: '#fff', fontFamily: 'Roboto-Regular', fontSize: 20, textAlign: 'center', padding: 20}}>
-                                            LOGIN
-                                        </Text>
-                                    }
+                            <View style={{flexDirection : 'row', margin : 10, marginTop : 1,  backgroundColor : '#fff', borderRadius : 10, justifyContent : 'center', alignItems : 'center'}}>
+                                <TextInput
+                                    autoCapitalize = 'none'
+                                    secureTextEntry = {true}
+                                    style = {{flex : 1, fontSize : 18, margin : 15, color : '#222'}}
+                                    placeholder = 'Password'
+                                    placeholderTextColor = '#555'
+                                    value = {password}
+                                    onChangeText = {(val)=>this.setState({password : val})}
+                                />
+                            </View>
+                            
+                            {
+                                loading &&
+                                <ActivityIndicator style={{ padding: 20 }} size="small" color="#fff" />
+                            }
+                            {
+                                error !== '' &&
+                                <Text style = {{fontSize : 15, color : 'yellow', textAlign : 'center', margin : 5}}>{error}</Text>
+                            }
+                            <View style={{flexDirection : 'row', margin : 10, padding : 5, marginTop : 1,  backgroundColor : '#fff', borderRadius : 40, alignSelf : 'center'}}>
+                                <TouchableOpacity activeOpacity = {enabled ? 0.5 : 0.95} onPress = {()=> enabled ? this.handleLogin(email, password, loading) : console.log('NO WAY')}>
+                                    <Icon name = 'arrow-right-circle' size = {35} color = {enabled ? '#444' : '#ddd'} style={{margin : 5}} />
                                 </TouchableOpacity>
                             </View>
-                        </KeyboardAvoidingView>
+                        </View>
+                    </View>
+
+                    <View style={{position : 'absolute', bottom : 20, alignSelf : 'center'}}>
+                        <Text style={{color : '#fff', fontSize : 12, textAlign : 'center', fontFamily : 'Roboto-Light'}}>Campus Story 2019</Text>
+                    </View>
                 </LinearGradient>
             </View>
         );

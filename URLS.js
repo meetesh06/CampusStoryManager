@@ -1,0 +1,18 @@
+const DEBUG_APP =  true; /* ACROSS THE APP */
+const DEBUG_NETWORK = true; /* FOR ALL NETWORK REQUEST */
+
+const PREFIX = DEBUG_NETWORK ? 'http://127.0.0.1:65534' : 'https://www.mycampusdock.com';
+
+const STAGING_CODEPUSH_IOS = '';
+const PRODUCTION_CODEPUSH_IOS = '';
+
+const PRODUCTION_CODEPUSH_ANDROID = '';
+const STAGING_CODEPUSH_ANDROID = '';
+
+const urls = {
+  CODEPUSH_IOS : DEBUG_APP ? STAGING_CODEPUSH_IOS : PRODUCTION_CODEPUSH_IOS,
+  CODEPUSH_ANDROID : DEBUG_APP ? STAGING_CODEPUSH_ANDROID : PRODUCTION_CODEPUSH_ANDROID,
+  URL_SIGNIN : PREFIX + '/auth/manager/signin',
+};
+
+export default urls;

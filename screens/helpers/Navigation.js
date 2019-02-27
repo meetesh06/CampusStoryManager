@@ -1,5 +1,8 @@
 import { Navigation } from 'react-native-navigation'
 import Icon from 'react-native-vector-icons/AntDesign';
+import Icon1 from 'react-native-vector-icons/Foundation';
+import Icon2 from 'react-native-vector-icons/FontAwesome5';
+import NavigationComponents from '../../NavigationComponents';
 
 export const goInitializing = () => Navigation.setRoot({
     root: {
@@ -22,10 +25,39 @@ export const goInitializing = () => Navigation.setRoot({
       }
 });
 
+const archive = {
+  id: 'archive',
+  component: {
+    name: 'home.ArchiveIcon'
+  }
+};
+
+const create_event = {
+  id: 'create_event',
+  component: {
+    name: 'home.CreateEventIcon'
+  }
+}
+
+const helpStory = {
+  id: 'help_story',
+  component: {
+    name: 'story.HelpIcon'
+  }
+};
+
+const doneStory = {
+  id: 'done_story',
+  component: {
+    name: 'story.DoneIcon'
+  }
+};
+
 export const goHome = async () => {
-  const homeIcon = await Icon.getImageSource('home', 30);
-  const areaChartIcon = await Icon.getImageSource('barschart', 30);
-  const profileIcon = await Icon.getImageSource('user', 30);
+  const homeIcon = await Icon1.getImageSource('home', 24);
+  const createIcon = await Icon.getImageSource('pluscircle', 24);
+  const profileIcon = await Icon2.getImageSource('user-tie', 24);
+  
   return Navigation.setRoot({
     root: {
       bottomTabs: {
@@ -46,7 +78,7 @@ export const goHome = async () => {
                   icon: homeIcon,
                   iconColor: '#c0c0c0',
                   textColor: '#c0c0c0',
-                  selectedIconColor: '#555'
+                  selectedIconColor: '#514A9D'
                 },
               },
               children: [
@@ -54,10 +86,17 @@ export const goHome = async () => {
                   component: {
                     name: 'Home Screen',
                     options: {
-                      
                       topBar: {
-                        visible: false,
-                        drawBehind: true,
+                        visible: true,
+                        animate: true,
+                        background: {
+                          color: '#fff',
+                          component: {
+                            name: 'homeTopBar'
+                          }
+                        },
+                        leftButtons : [archive],
+                        rightButtons : [create_event]
                       }
                     }
                   }
@@ -67,7 +106,7 @@ export const goHome = async () => {
           },
           {
             stack: {
-              id: "Analytics Stack",
+              id: "Create Stack",
               options: {
                 topBar: {
                   visible: false,
@@ -76,22 +115,29 @@ export const goHome = async () => {
                 bottomTab: {
                   fontSize: 10,
                   selectedFontSize: 12,
-                  text: 'Analytics',
-                  icon: areaChartIcon,
+                  text: 'Story',
+                  icon: createIcon,
                   iconColor: '#c0c0c0',
                   textColor: '#c0c0c0',
-                  selectedIconColor: '#555'
+                  selectedIconColor: '#514A9D'
                 },
               },
               children: [
                 {
                   component: {
-                    name: 'Analytics Screen',
+                    name: 'Story Screen',
                     options: {
-                      
                       topBar: {
-                        visible: false,
-                        drawBehind: true,
+                        visible: true,
+                        animate: true,
+                        background: {
+                          color: '#fff',
+                          component: {
+                            name: 'homeTopBar',
+                          }
+                        },
+                        leftButtons : [helpStory],
+                        rightButtons : [doneStory]
                       }
                     }
                   }
@@ -100,23 +146,43 @@ export const goHome = async () => {
             }
           },
           {
-            component: {
-              name: 'Profile Screen',
+            stack: {
+              id: "Profile Stack",
               options: {
+                topBar: {
+                  visible: false,
+                  drawBehind: true,
+                },
                 bottomTab: {
-                  text: 'Profile',
                   fontSize: 10,
                   selectedFontSize: 12,
+                  text: 'Profile',
                   icon: profileIcon,
                   iconColor: '#c0c0c0',
                   textColor: '#c0c0c0',
-                  selectedIconColor: '#555'
+                  selectedIconColor: '#514A9D'
                 },
-                topBar: {
-                  visible: false
+              },
+              children: [
+                {
+                  component: {
+                    name: 'Home Screen',
+                    options: {
+                      topBar: {
+                        visible: true,
+                        animate: true,
+                        background: {
+                          color: '#fff',
+                          component: {
+                            name: 'homeTopBar'
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
-              }
-            },
+              ]
+            }
           },
         ],
       }
