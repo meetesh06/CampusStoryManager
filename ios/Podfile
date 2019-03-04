@@ -23,5 +23,6 @@ target 'CampusStoryManager' do
   pod 'react-native-video/VideoCaching', :path => '../node_modules/react-native-video/react-native-video.podspec'
   pod 'RNFileViewer', :path => '../node_modules/react-native-file-viewer/ios'
   pod 'react-native-blur', :path => '../node_modules/react-native-blur'
-
+  pod 'CodePush', :path => '../node_modules/react-native-code-push'
+  
 end

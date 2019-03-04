@@ -1,5 +1,11 @@
 PODS:
+  - Base64 (1.1.2)
   - boost-for-react-native (1.63.0)
+  - CodePush (5.5.2):
+    - Base64 (~> 1.1)
+    - JWT (~> 3.0.0-beta.7)
+    - React
+    - SSZipArchive (~> 2.1)
   - DoubleConversion (1.1.5)
   - DVAssetLoaderDelegate (0.3.2)
   - FLAnimatedImage (1.0.12)
@@ -8,6 +14,8 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.4)
+  - JWT (3.0.0-beta.11):
+    - Base64 (~> 1.1.2)
   - libwebp (0.6.1):
     - libwebp/core (= 0.6.1)
     - libwebp/dec (= 0.6.1)
@@ -91,9 +99,11 @@ PODS:
     - libwebp (~> 0.5)
     - SDWebImage/Core
   - SPTPersistentCache (1.1.0)
+  - SSZipArchive (2.1.4)
   - yoga (0.57.8.React)
 
 DEPENDENCIES:
+  - CodePush (from `../node_modules/react-native-code-push`)
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - react-native-blur (from `../node_modules/react-native-blur`)
   - react-native-fast-image (from `../node_modules/react-native-fast-image`)
@@ -111,16 +121,21 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
+    - Base64
     - boost-for-react-native
     - DoubleConversion
     - DVAssetLoaderDelegate
     - FLAnimatedImage
     - glog
+    - JWT
     - libwebp
     - SDWebImage
     - SPTPersistentCache
+    - SSZipArchive
 
 EXTERNAL SOURCES:
+  CodePush:
+    :path: "../node_modules/react-native-code-push"
   Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/Folly.podspec"
   React:
@@ -137,12 +152,15 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  Base64: cecfb41a004124895a7bcee567a89bae5a89d49b
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
+  CodePush: b4c024dfc7b1f44434aaadf9f6763bb22e243980
   DoubleConversion: e22e0762848812a87afd67ffda3998d9ef29170c
   DVAssetLoaderDelegate: 38a24530292bf77900fdfdf635434f7f9b49486d
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   Folly: c89ac2d5c6ab169cd7397ef27485c44f35f742c7
   glog: 1de0bb937dccdc981596d3b5825ebfb765017ded
+  JWT: 05028b9624591bba9681bb57df2c5f95fa258bad
   libwebp: 0f01098c6c17175391af621b2f14150f3ca16e16
   React: adbac0757ce35e92fbd447ab98c810209d27d9b0
   react-native-blur: cad4d93b364f91e7b7931b3fa935455487e5c33c
@@ -151,8 +169,9 @@ SPEC CHECKSUMS:
   RNFileViewer: 5047ecf40477339723cc08abd55b5ebcefcef4b5
   SDWebImage: c5594f1a19c48d526d321e548902b56b479cd508
   SPTPersistentCache: df36ea46762d7cf026502bbb86a8b79d0080dff4
+  SSZipArchive: 41455d4b8d2b6ab93990820b50dc697c2554a322
   yoga: 74cdf036c30820443b25ade59916236b1e95ee93
 
-PODFILE CHECKSUM: f6d90aee3bdd06408330f28e47e013b5a3aaa0fc
+PODFILE CHECKSUM: 50c11bfa08101ae7effc8d542f87a037bad00050
 
 COCOAPODS: 1.6.0

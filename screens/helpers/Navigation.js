@@ -2,7 +2,6 @@ import { Navigation } from 'react-native-navigation'
 import Icon from 'react-native-vector-icons/AntDesign';
 import Icon1 from 'react-native-vector-icons/Foundation';
 import Icon2 from 'react-native-vector-icons/FontAwesome5';
-import NavigationComponents from '../../NavigationComponents';
 
 export const goInitializing = () => Navigation.setRoot({
     root: {
@@ -43,6 +42,13 @@ const helpStory = {
   id: 'help_story',
   component: {
     name: 'story.HelpIcon'
+  }
+};
+
+const settings = {
+  id: 'settings',
+  component: {
+    name: 'settings.Icon'
   }
 };
 
@@ -95,7 +101,6 @@ export const goHome = async () => {
                             name: 'homeTopBar'
                           }
                         },
-                        leftButtons : [archive],
                         rightButtons : [create_event]
                       }
                     }
@@ -136,7 +141,6 @@ export const goHome = async () => {
                             name: 'homeTopBar',
                           }
                         },
-                        leftButtons : [helpStory],
                         rightButtons : [doneStory]
                       }
                     }
@@ -166,7 +170,7 @@ export const goHome = async () => {
               children: [
                 {
                   component: {
-                    name: 'Home Screen',
+                    name: 'Profile Screen',
                     options: {
                       topBar: {
                         visible: true,
@@ -176,7 +180,8 @@ export const goHome = async () => {
                           component: {
                             name: 'homeTopBar'
                           }
-                        }
+                        },
+                        rightButtons : [settings]
                       }
                     }
                   }

@@ -1,8 +1,11 @@
 import React from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+import {View, Text, Alert, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon2 from 'react-native-vector-icons/Ionicons';
+import { Navigation } from 'react-native-navigation';
+import SessionStore from './SessionStore'
+import Realm from './realm';
+import {goInitializing} from './screens/helpers/Navigation';
 
 const homeTopBar = () => (
     <View
@@ -52,7 +55,7 @@ const createEventIcon = () => (
       () => {
         Navigation.showModal({
           component: {
-            name: 'Archive Screen',
+            name: 'Create Event Screen',
             options: {
               topBar: {
                 visible: false
@@ -74,9 +77,33 @@ const helpStoryIcon = () => (
     }}
     onPress={
       () => {
+        Realm.getRealm((realm)=>{
+          realm.write(async () => {
+            realm.deleteAll();
+            await new SessionStore().reset();
+            goInitializing();
+          });
+        });
+      }
+    }
+  >
+    <Icon2 size={25} style={{ color: '#514A9D' }} name="md-help-circle"/>
+  </TouchableOpacity>
+);
+
+const settingsIcon = () => (
+  <TouchableOpacity
+    style={{
+      padding : 5,
+    }}
+    onPress={
+      () => {
         Navigation.showModal({
           component: {
-            name: 'Archive Screen',
+            name: 'Settings Screen',
+            passProps: {
+              
+            },
             options: {
               topBar: {
                 visible: false
@@ -87,7 +114,7 @@ const helpStoryIcon = () => (
       }
     }
   >
-    <Icon2 size={25} style={{ color: '#514A9D' }} name="md-help-circle"/>
+    <Icon2 size={25} style={{ color: '#514A9D' }} name="md-settings"/>
   </TouchableOpacity>
 );
 
@@ -98,16 +125,24 @@ const doneStoryIcon = () => (
     }}
     onPress={
       () => {
-        Navigation.showModal({
-          component: {
-            name: 'Archive Screen',
-            options: {
-              topBar: {
-                visible: false
+        const active = new SessionStore().getValueTemp('active');
+        if(active !== null){
+          const data = active.exportData();
+          if(data.empty) return Alert.alert('Create A Story', 'Fill data to procedd.');
+          Navigation.showModal({
+            component: {
+              name: 'Submit Story',
+              passProps: {
+                data
+              },
+              options: {
+                topBar: {
+                  visible: false
+                }
               }
             }
-          }
-        });
+          });
+        }
       }
     }
   >
@@ -120,6 +155,7 @@ const navigationComponents = {
     ARCHIVE_ICON : archiveIcon,
     CREATE_EVENT_ICON : createEventIcon,
     HELP_STORY_ICON : helpStoryIcon,
+    SETTINGS_ICON : settingsIcon,
     DONE_STORY_ICON : doneStoryIcon
 }
 

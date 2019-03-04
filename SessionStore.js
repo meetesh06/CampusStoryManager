@@ -78,7 +78,14 @@ export default class SessionStore {
   }
 
   reset = async () =>{
-    /* CLEAN STATE MISSING*/
+    this.state = {
+      [TOKEN] : 'something',
+      [CONFIG] : {},
+      [SET_UP_STATUS] : false,
+      [SESSION_ID] : '',
+      [USER_DATA] : {}
+    }
+    
     /* CLEAN TEMP HOLDER MISSING */
     await AsyncStorage.clear();
   }

@@ -1,646 +1,522 @@
 import React from 'react';
-import {
- Dimensions, AsyncStorage, Alert, FlatList, TextInput, ScrollView, KeyboardAvoidingView, TouchableOpacity, Text, View, Platform, Image 
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
-import axios from 'axios';
-import FastImage from 'react-native-fast-image';
-import DateTimePicker from 'react-native-modal-datetime-picker';
-import ImagePicker from 'react-native-image-picker';
+import { Text, StatusBar, Platform, View, TextInput, ScrollView, TouchableOpacity, Alert, FlatList } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { Navigation } from 'react-native-navigation';
-import ProgressBarAnimated from 'react-native-progress-bar-animated';
-import Constants from '../constants';
-const artImage = require('../media/topics/art.webp');
-// const hottestImage = require('../../media/topics/hot.webp');
-const foodImage = require('../media/topics/food.webp');
-const musicImage = require('../media/topics/music.webp');
-const sagImage = require('../media/topics/sag.webp');
-const dadImage = require('../media/topics/dad.webp');
-const funImage = require('../media/topics/fun.webp');
-const communityImage = require('../media/topics/community.webp');
+import ImagePicker from 'react-native-image-picker';
+import FastImage from 'react-native-fast-image';
+import {getMonthName, formatAMPM} from './helpers/functions'
+import Icon2 from 'react-native-vector-icons/Entypo';
+import Icon3 from 'react-native-vector-icons/Feather';
+import Icon4 from 'react-native-vector-icons/MaterialCommunityIcons';
+import DateTimePicker from 'react-native-modal-datetime-picker';
+import {categories} from './helpers/values';
+import AdvertCard from '../components/AdvertCard';
+import SessionStore from '../SessionStore';
+import constants from '../constants';
+import urls from '../URLS';
+import axios from 'axios';
 
-const categories = [
-  {
-    title: 'Food',
-    value: 'food',
-    image: foodImage
-  },
-  {
-    title: 'Music and Dance',
-    value: 'mad',
-    image: musicImage
-  },
-  {
-    title: 'Art',
-    value: 'art',
-    image: dadImage
-  },
-  {
-    title: 'Society',
-    value: 'society',
-    image: communityImage
-  },
-  {
-    title: 'Sports',
-    value: 'sports',
-    image: sagImage
-  },
-  {
-    title: 'Fun',
-    value: 'fun',
-    image: funImage
-  }
-];
-
-const { TOKEN } = Constants;
-
-const options = {
-  title: 'Select Event Poster',
-};
-class createEventScreen extends React.Component {
-  constructor(props) {
-    super(props);
-    this.valid = this.valid.bind(this);
-    this.handleCreateEvent = this.handleCreateEvent.bind(this);
-    this.openImagePicker = this.openImagePicker.bind(this);
-    this.ValidURL = this.ValidURL.bind(this);
-  }
+class CreateEventScreen extends React.Component {
+    constructor(props) {
+        super(props);
+    }
 
     state = {
-      title: '',
-      description: '',
-      location: '',
-      category: '',
-      tags: '',
-      // categories: [],
-      loading: false,
-      isDateTimePickerVisible: false,
-      reg_start: '',
-      reg_end: '',
-      reg_link: '',
-      picker: '',
-      date: '',
-      time: '',
-      contact_details: '',
-      faq: '',
-      // price: '',
-      // available_seats: '',
-      image: null,
-      response: null,
-      progress: 0
+        interests : [],
+        category : '',
+        imageURI : '',
+        title : '',
+        date : new Date(),
+        time : new Date(),
+        location : '',
+        description : '',
+        contact_details : '',
+        faq : '',
+        reg_link : '',
+        isDateTimePickerVisible : false
     }
 
-    componentDidMount() {
-      const formData = new FormData();
-      formData.append('dummy', '');
-    }
-
-
-    openImagePicker = () => {
-      ImagePicker.showImagePicker(options, (response) => {
-        // console.log('Response = ', response);
-
-        if (response.didCancel) {
-          //   console.log('User cancelled image picker');
-        } else if (response.error) {
-          //   console.log('ImagePicker Error: ', response.error);
-        } else if (response.customButton) {
-          //   console.log('User tapped custom button: ', response.customButton);
-        } else {
-          const source = { uri: response.uri };
-          // You can also display the image using data:
-          // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-          this.setState({
-            image: source,
-            response
-          });
+    componentDidMount(){
+        let interests = [];
+        for (i = 0; i < categories.length; i++) {
+            interests.push(categories[i]);
         }
-      });
+        this.setState({interests, category : interests[0]});
     }
 
-    _showDateTimePicker = picker => this.setState({ isDateTimePickerVisible: true, picker });
+    openImagePicker = () =>{
+        const options = {
+            title: 'Pick an Image',
+            noData : true,
+            storageOptions:{
+                skipBackup:true,
+                path:'images'
+            }
+        };
 
-    _hideDateTimePicker = () => {
-      this.setState({ isDateTimePickerVisible: false });
-    };
-
-    _handleDatePicked = (val) => {
-      this.setState({ [this.state.picker]: val });
-      this._hideDateTimePicker();
-    }
-
-    handleCreateEvent = async () => {
-      if (!this.valid()) return;
-      this.setState({ loading: true });
-      const context = this;
-      const formData = new FormData();
-      formData.append('title', this.state.title);
-      formData.append('description', this.state.description);
-      formData.append('location', this.state.location);
-      formData.append('category', this.state.category);
-      formData.append('tags', this.state.tags);
-      formData.append('reg_start', `${this.state.reg_start  }`);
-      formData.append('reg_end', `${this.state.reg_end  }`);
-      formData.append('date', `${this.state.date  }`);
-      formData.append('time', this.state.time.toString());
-      formData.append('contact_details', this.state.contact_details);
-      formData.append('faq', this.state.faq);
-      formData.append('price', '10');
-      formData.append('available_seats', '10');
-      formData.append('reg_link', this.state.reg_link.trim());
-      const response = this.state.response;
-      formData.append('file', {
-        uri: response.uri,
-        type: response.type,
-        name: response.fileName
-      });
-
-      axios.post('https://www.mycampusdock.com/events/manager/create', formData, {
-        onUploadProgress(progressEvent) {
-                let percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
-                context.setState({ progress: percentCompleted });
-            },
-        headers: {
-			  'Content-Type': 'multipart/form-data',
-          //   'Accept': 'application/json',
-			  'x-access-token': await AsyncStorage.getItem(TOKEN)
-        }
-
-		  })
-		  .then((result) => {
-          result = result.data;
-          // console.log(result);
-          if (!result.error) {
-            Navigation.pop(this.props.componentId);
-            Alert.alert('Event Created successfully');
-          } else {
-          }
-          this.setState({ loading: false });
-		  })
-		  .catch((err) => {
-			  	// console.log("DOPE ", err);
-			  	Alert.alert(
-            err.toString()
-          );
-          this.setState({ loading: false });
+        ImagePicker.launchImageLibrary(options, (response) => {
+            if (response.didCancel) {
+                console.log('CANCELED');
+            } else if (response.error) {
+                console.log('ERROR OCCURED');
+            } else if (response.customButton) {
+                console.log('CUSTOM ACTION');
+            } else {
+                this.setState({imageURI : response.uri, imageType : response.type, imageName : response.fileName});
+            }
         });
     }
 
-  ValidURL = (str) => {
-    try {
-      new URL(str);
-      return true;
-    } catch (_) {
-      return false;  
-    }
-  }
-
-  formatAMPM = (date) => {
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    hours %= 12;
-    hours = hours || 12; // the hour '0' should be '12'
-    minutes = minutes < 10 ? `0${minutes}` : minutes;
-    const strTime = `${hours}:${minutes} ${ampm}`;
-    return strTime;
-  }
-  
+    _showDateTimePicker = picker => this.setState({ isDateTimePickerVisible: true, picker });
     
-    valid = () => {
-      if (this.state.title.length < 5) {
-        Alert.alert('Invalid Title');
-        return false;
-      }
-      if (this.state.description.length < 5) {
-        Alert.alert('Invalid Description');
-        return false;
-      }
-      if (this.state.location.length < 3) {
-        Alert.alert('Invalid Location');
-        return false;
-      }
-      if (this.state.category === '') {
-        Alert.alert('Invalid Category');
-        return false;
-      }
-      if (this.state.reg_start === '') {
-        Alert.alert('Invalid Registration Start Date');
-        return false;
-      }
-      if (this.state.reg_end === '') {
-        Alert.alert('Invalid Registration End Date');
-        return false;
-      }
-      if (this.state.date === '') {
-        Alert.alert('Invalid Event Date');
-        return false;
-      }
-      if (this.state.time === '') {
-        Alert.alert('Invalid Event Time');
-        return false;
-      }
-      if (this.state.contact_details === '') {
-        Alert.alert('Invalid Contact Details');
-        return false;
-      }
+    _handleDatePicked = (val) => {
+        this.setState({ [this.state.picker]: val });
+        this._hideDateTimePicker();
+    }
 
-      // if (this.state.reg_link.trim() !== '') {
-      //   if (!this.ValidURL(this.state.reg_link)) {
-      //     Alert.alert('Invalid Link');
-      //     return false;
-      //   }
-      // }
-      // if (!parseInt(this.state.price)) {
-      //   if (this.state.price !== '0') {
-      //     Alert.alert('Price must be a number');
-      //     return false;
-      //   }
-      // }
-      // if (!parseInt(this.state.available_seats)) {
-      //   Alert.alert('Available Seats must be a number');
-      //   return false;
-      // }
+    _hideDateTimePicker = () => {
+        this.setState({ isDateTimePickerVisible: false });
+    };
 
-      if (this.state.image === null) {
-        Alert.alert('Please select a valid poster');
-        return false;
-      }
+    validData = () =>{
+        const { title, location, time, description, contact_details, faq, reg_link, imageURI, date, category } = this.state;
+        let data = {};
+        data.time = time;
+        if(imageURI === '') {
+            Alert.alert(
+                'Fill Details Properly',
+                'Image is mandatory for events, please pick an image.'
+            );
+            return false;
+        }
+        data.image = imageURI;
 
-      return true;
+        if( Math.abs((date.getTime() - new Date().getTime())) < 2 * 60 * 60 * 1000){
+            Alert.alert(
+                'Fill Details Properly',
+                'Please select a valid date for the event.'
+            );
+            return false;
+        }
+        data.date = date;
+
+        if(title.trim().length <  5){
+            Alert.alert(
+                'Fill Details Properly',
+                'Please put a valid title of the event.'
+            );
+            return false;
+        }
+        data.title = title.trim();
+
+        if(location.trim().length < 5){
+            Alert.alert(
+                'Fill Details Properly',
+                'Please put a valid location of the event.'
+            );
+            return false;
+        }
+        data.location = location.trim();
+
+        if(description.trim().length <  5){
+            Alert.alert(
+                'Fill Details Properly',
+                'Please put a valid description about the event.'
+            );
+            return false;
+        }
+        data.description = description.trim();
+
+        if(contact_details.trim().length <  5){
+            Alert.alert(
+                'Fill Details Properly',
+                'Please put a valid contact details about the event.'
+            );
+            return false;
+        }
+        data.contact_details = contact_details.trim();
+
+        if(faq.trim().length > 0 && faq.trim().length < 5){
+            Alert.alert(
+                'Fill Details Properly',
+                "Please put a valid FAQ's about the event."
+            );
+            return false;
+        }
+        data.faq = faq.trim();
+
+        if(reg_link.trim().length > 0 && reg_link.trim().length < 5){
+            Alert.alert(
+                'Fill Details Properly',
+                'Please put a valid registeration link of the event.'
+            );
+            return false;
+        }
+        data.reg_link = reg_link.trim();
+
+        if(category === ''){
+            Alert.alert(
+                'Fill Details Properly',
+                'Please select a valid category for the event.'
+            );
+            return false;
+        }
+        data.category = category.trim();
+
+        return data;
+    }
+
+    handleDone = () =>{
+        const data = this.validData();
+        if(data){
+            this.setState({ loading: true });
+            const context = this;
+            const formData = new FormData();
+            formData.append('title', data.title);
+            formData.append('description', data.description);
+            formData.append('location', data.location);
+            formData.append('category', data.category);
+            formData.append('date', data.date.toString());
+            formData.append('time', data.time.toString());
+            formData.append('contact_details', data.contact_details);
+            formData.append('faq', data.faq);
+            formData.append('reg_link', data.reg_link);
+
+            formData.append('file', {
+              uri: this.state.imageURI,
+              type: this.state.imageType,
+              name: new SessionStore().getValue(constants.USER_DATA).channel + '_' + this.state.imageName
+            });
+      
+            axios.post(urls.URL_CREATE_EVENT, formData, {
+              onUploadProgress(progressEvent) {
+                      let percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
+                      context.setState({ progress: percentCompleted });
+                },
+              headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'x-access-token': new SessionStore().getValue(constants.TOKEN)
+                }
+            })
+            .then((response) => {
+                console.log(response);
+                let result = response.data;
+                if (!result.error) {
+                  Navigation.dismissModal(this.props.componentId);
+                  this.setState({ loading: false });
+                  Alert.alert('Event Created Successfully');
+                } else {
+                    Alert.alert('Somethign went wrong', 'Try again later');
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                Alert.alert('Somethign went wrong');
+                this.setState({ loading: false });
+            });
+        }
     }
 
     render() {
-      const barWidth = Dimensions.get('screen').width - 40;
-      return (
-          <View style={{ flex: 1, backgroundColor: '#fff' }}>
-              <KeyboardAvoidingView behavior={Platform.OS === 'android' ? '' : 'padding'} style={{
- flex: 1, marginBottom: Platform.OS === 'android' ? 0 : 35, paddingBottom: 10, backgroundColor: '#fff', borderRadius: 10, marginLeft: 10, marginRight: 10, paddingTop: 0, paddingLeft: 10, paddingRight: 10 
-}}>
-                  <ScrollView
-                      keyboardShouldPersistTaps="handled"
-                    >
-                      {
-                    this.state.image === null 
-                    && <Image
-style={{
-                      borderRadius: 10,
-                      margin: 5,
-                      alignSelf: 'center',
-                      width: 200,
-                      height: 150 
-}}
-                      source={require('../media/event.jpg')}
-                    />
-                }
-                      {
-                    this.state.image !== null 
-                    && <Image
-style={{
-                      borderRadius: 10,
-                      margin: 5,
-                      alignSelf: 'center',
-                      width: 200,
-                      height: 150 
-}}
-                      source={{ uri: this.state.image.uri }}
-                    />
-                }
-                      <TouchableOpacity
-                  style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center'
-                    }}
-                  onPress={this.openImagePicker}
-                >
-                  <Text
-                      style={{
-                          fontFamily: 'Roboto-Light',
-                          fontSize: 15,
-                          marginRight: 5
-                        }}
-                    >
-                        CHANGE IMAGE
-                    </Text>
-                  <Icon size={15} name="edit" />
+        const { title, location, time, description, contact_details, faq, reg_link, imageURI, date, interests } = this.state;
+        return(
+            <View style={{flex: 1, backgroundColor : '#fff', marginTop : Platform.OS === 'ios' ? 45 : 8}}>
+                <StatusBar hidden />
+                <View style={{flexDirection : 'row', backgroundColor : '#fff', justifyContent : 'center', alignItems : 'center'}}>
+                    <TouchableOpacity onPress = {()=>Navigation.dismissModal(this.props.componentId)}>
+                        <Icon name = 'ios-arrow-round-back' size = {30} style={{margin : 5, width : 50}} />
+                    </TouchableOpacity>
+                    
+                    <View style={{flex : 1}}/>
 
-                </TouchableOpacity>
-                      <TextInput
-                          style={{
- padding: 10, fontSize: 20, backgroundColor: '#f9f5ed', borderRadius: 10, marginTop: 10 
-}}
-                          onChangeText={title => this.setState({ title })}
-                          value={this.state.title}
-                          autoCapitalize="none"
-                          placeholder="Event Title"
-                        />
-                      <TextInput
-                          multiline
-                          numberOfLines={5}
-                          style={{
-                              padding: 10,
-                              fontSize: 20,
-                              backgroundColor: '#f9f5ed',
-                              borderRadius: 10,
-                              marginTop: 10,
-                              minHeight: 80
-                            }}
-                          onChangeText={description => this.setState({ description })}
-                          value={this.state.description}
-                          autoCapitalize="none"
-                          placeholder="Event Description"
-                        />
-                      <TextInput
-                          style={{
- padding: 10, fontSize: 20, backgroundColor: '#f9f5ed', borderRadius: 10, marginTop: 10 
-}}
-                          onChangeText={location => this.setState({ location })}
-                          value={this.state.location}
-                          autoCapitalize="none"
-                          placeholder="Event Location"
-                        />
-                      <TextInput
-                          style={{
- padding: 10, fontSize: 20, backgroundColor: '#f9f5ed', borderRadius: 10, marginTop: 10 
-}}
-                          onChangeText={tags => this.setState({ tags })}
-                          value={this.state.tags}
-                          autoCapitalize="none"
-                          placeholder="Event Tags: Technology, Machine Learning, AI"
-                        />
-                      {/* <Text
-                            style={{
-                                marginTop: 10,
-                                fontFamily: 'Roboto',
-                                textAlign: 'center'
-                            }}
-                        >
-                            Select a category
-                        </Text> */}
-                      <FlatList
-                          horizontal
-                          style={{ marginBottom: 10 }}
-                          showsHorizontalScrollIndicator={false}
-                          keyExtractor={(value, index) => `${index  }`}
-                          data={categories}
-                          renderItem={({ item }) => (
-                            <TouchableOpacity
-                                    style={{
-                                        // backgroundColor: '#c0c0c0',
-                                        borderRadius: 10,
-                                        width: 100,
-                                        margin: 5
-                                    }}
-                                    onPress={
-                                        () => this.setState({
-                                            category: item.value
-                                        })
-                                    }
-                                >
-                                    <FastImage
-                                        source={item.image}
-                                        style={{
-                                            width: 100,
-                                            height: 75,
-                                            borderRadius: 10,
-                                            opacity: this.state.category === item.value ? 0.5 : 1,
-                                            
-                                        }}
-                                        resizeMode={FastImage.resizeMode.contain}
-                                    />
-                                    <Text
-                                      style={{
-                                        textAlign: 'center'
-                                      }}
-                                    >
-                                      {item.title}
-                                    </Text>
+                    <Text style={{fontSize : 18, textAlign : 'center', fontFamily : 'Roboto-Light'}}>Create an Event</Text>
+                    
+                    <View style={{flex : 1}}/>
+                    
+                    <TouchableOpacity onPress = {()=>this.handleDone()}>
+                        <Text style={{fontSize : 15, textAlign : 'center', margin : 5, width : 50, color : 'green'}}>Done</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <ScrollView style={{flex : 1, backgroundColor : '#efefef', marginRight : 5}}>
+                    <View style={{margin : 10, borderRadius : 10, backgroundColor : '#ddd'}}>
+                        {
+                            imageURI === '' &&
+                            <View style={{backgroundColor : '#ddd'}}>
+                                <TouchableOpacity style={{height : 220, justifyContent : 'center', alignItems : 'center'}} onPress = {this.openImagePicker}> 
+                                    <Icon2 name = 'images' size = {50} color = '#fff' />
+                                    <Text style={{fontSize : 20, fontFamily : 'Roboto-Light', color : '#555'}}>Pick an Image</Text>
                                 </TouchableOpacity>
-)}
-                        />
-                      <TouchableOpacity
-                          style={{
-                              backgroundColor: '#3f51b5',
-                              margin: 10,
-                              borderRadius: 10,
-                              padding: 10
-                            }}
-                          onPress={() => this._showDateTimePicker('date')}
-                        >
-                          <Text
-                              style={{
-                                  textAlign: 'center',
-                                  fontFamily: 'Roboto-Light',
-                                  fontSize: 20,
-                                  color: '#fff'
+                            </View>
+                        }
+                        {
+                            imageURI.length > 0 && 
+                            <FastImage 
+                                source={{
+                                    uri: encodeURI(imageURI)
                                 }}
-                            >
-{this.state.date === "" ? "Event Date" : this.state.date + ""}
-
-                            </Text>
-                        </TouchableOpacity>
-                      <TouchableOpacity
-                          style={{
-                              backgroundColor: '#3f51b5',
-                              margin: 10,
-                              borderRadius: 10,
-                              padding: 10
-                            }}
-                          onPress={() => this._showDateTimePicker('time')}
-                        >
-                          <Text
-                              style={{
-                                  textAlign: 'center',
-                                  fontFamily: 'Roboto-Light',
-                                  fontSize: 20,
-                                  color: '#fff'
+                                style={{
+                                    height : 220,
+                                    width : '100%',
+                                    borderRadius : 10,
                                 }}
-                            >
-{this.state.time === "" ? "Event Time" : this.formatAMPM(this.state.time) + ""}
-
-                            </Text>
-                        </TouchableOpacity>
-                      <View
-                          style={{
-                              margin: 5,
-                              flex: 1,
-                              // height: 150,
-                              borderRadius: 10,
-                              backgroundColor: '#f0f0f0'
-                            }}
-                        >
-                          <Text
-                              style={{
-                                  textAlign: 'center',
-                                  margin: 15,
-                                  fontFamily: 'Roboto'
-                                }}
-                            >
-                                Registration Dates
-                            </Text>
-                          <TouchableOpacity
-                              style={{
-                                  backgroundColor: '#2e7d32',
-                                  margin: 10,
-                                  borderRadius: 10,
-                                  padding: 10
-                                }}
-                              onPress={() => this._showDateTimePicker('reg_start')}
-                            >
-                              <Text
-                                  style={{
-                                      textAlign: 'center',
-                                      fontFamily: 'Roboto-Light',
-                                      fontSize: 20,
-                                      color: '#fff'
-                                    }}
-                                >
-{this.state.reg_start === "" ? "Start Date" : this.state.reg_start + ""}
-
-                                </Text>
-                            </TouchableOpacity>
-                          <TouchableOpacity
-                              style={{
-                                  backgroundColor: '#dd2c00',
-                                  margin: 10,
-                                  borderRadius: 10,
-                                  padding: 10
-                                }}
-                              onPress={() => this._showDateTimePicker('reg_end')}
-                            >
-                              <Text
-                                  style={{
-                                      textAlign: 'center',
-                                      fontFamily: 'Roboto-Light',
-                                      fontSize: 20,
-                                      color: '#fff'
-                                    }}
-                                >
-{this.state.reg_end === "" ? "End Date" : this.state.reg_end + ""}
-
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                      <TextInput
-                          multiline
-                          numberOfLines={5}
-                          style={{
-                              padding: 10,
-                              fontSize: 20,
-                              backgroundColor: '#f9f5ed',
-                              borderRadius: 10,
-                              marginTop: 10,
-                              minHeight: 80
-                            }}
-                          onChangeText={contact_details => this.setState({ contact_details })}
-                          value={this.state.contact_details}
-                          autoCapitalize="none"
-                          placeholder="Contact Details"
-                        />
-                      <TextInput
-                          multiline
-                          numberOfLines={5}
-                          style={{
-                              padding: 10,
-                              fontSize: 20,
-                              backgroundColor: '#f9f5ed',
-                              borderRadius: 10,
-                              marginTop: 10,
-                              minHeight: 80
-                            }}
-                          onChangeText={faq => this.setState({ faq })}
-                          value={this.state.faq}
-                          autoCapitalize="none"
-                          placeholder="Frequently Asked Questions"
-                        />
-                      <TextInput
-                          style={{
-                              padding: 10,
-                              fontSize: 20,
-                              backgroundColor: '#f9f5ed',
-                              borderRadius: 10,
-                              marginTop: 10
-                            }}
-                          onChangeText={reg_link => this.setState({ reg_link })}
-                          value={this.state.reg_link}
-                          autoCapitalize="none"
-                          placeholder="Google Form's Link"
-                        />
-                      {/* <TextInput
-                          style={{
- padding: 10, fontSize: 20, backgroundColor: '#f9f5ed', borderRadius: 10, marginTop: 10 
-}}
-                          onChangeText={price => this.setState({ price })}
-                          value={this.state.price}
-                          autoCapitalize="none"
-                          placeholder="Event Price"
-                        /> */}
-                      {/* <TextInput
-                          style={{
- padding: 10, fontSize: 20, backgroundColor: '#f9f5ed', borderRadius: 10, marginTop: 10 
-}}
-                          onChangeText={available_seats => this.setState({ available_seats })}
-                          value={this.state.available_seats}
-                          autoCapitalize="none"
-                          placeholder="Available Seats"
-                        /> */}
-                      <View
-                          style={{
-                              marginTop: 15
-                            }}
-                        >
-                          <ProgressBarAnimated
-                              width={barWidth}
-                              value={this.state.progress}
-                              backgroundColorOnComplete="#6CC644"
+                                resizeMode={FastImage.resizeMode.cover}
                             />
-                        </View>
-                      <TouchableOpacity
-                          disabled={this.state.loading}
-                          style={{
-                              backgroundColor: this.state.loading ? '#c0c0c0' : 'red',
-                              // margin: 10,
-                              borderRadius: 10,
-                              marginTop: 15,
-                              padding: 10
+                        }
+                    </View>
+                    
+                    <View style={{flexDirection : 'row', margin : 5, padding : 5}}>
+                        <TouchableOpacity
+                            style={{
+                            marginRight: 5,
+                            width: 50,
+                            paddingTop: 5,
+                            paddingBottom: 5,
+                            borderRadius: 5
                             }}
-                          onPress={() => Alert.alert(
-                              'Create Event',
-                              'Are you sure you want to create this event ?',
-                              [
-                                { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                                { text: 'OK', onPress: () => this.handleCreateEvent() },
-                              ],
-                              { cancelable: false }
-                            )}
+                            onPress={()=>this._showDateTimePicker('date')}
                         >
-                          <Text
-                              style={{
-                                  textAlign: 'center',
-                                  fontFamily: 'Roboto',
-                                  fontSize: 20,
-                                  color: '#fff'
-                                }}
+                            <Text
+                            style={{
+                                fontFamily: 'Roboto',
+                                fontSize: 15,
+                                color: '#514A9D',
+                                textAlign: 'center',
+                                fontWeight: '900'
+                            }}
                             >
-                                CREATE EVENT
+                                { getMonthName(date.getMonth() + 1) }
+                            </Text>
+                            <Text
+                            style={{
+                                textAlign: 'center',
+                                fontSize: 22,
+                                color: '#a0a0a0',
+                            }}
+                            >
+                            { JSON.stringify(date.getDate()) }
                             </Text>
                         </TouchableOpacity>
-                      <View
-                          style={{
-                              height: 10
+                        <TextInput
+                            numberOfLines = {1}
+                            maxLength = {40}
+                            placeholder = "Event's Title"
+                            placeholderTextColor = '#555'
+                            style={{color : '#333', width : 50, borderWidth : 0.2, flex : 1, padding : 0, paddingLeft : 5, borderColor : '#888', borderRadius : 5, fontSize : 16}}
+                            autoCapitalize = 'sentences'
+                            keyboardType = 'default'
+                            keyboardAppearance = 'light'
+                            value = {title}
+                            onChangeText = {val=>this.setState({title : val})}
+                        />
+                    </View>
+
+                    <View style={{flexDirection : 'row', margin : 5, padding : 5}}>
+                        <View style={{
+                            marginRight: 5,
+                            width: 50,
+                            paddingTop: 5,
+                            paddingBottom: 5,
+                            borderRadius: 5
+                        }}>
+                            <Icon2 style={{ alignSelf: 'center', color: '#514A9D', }} size={35} name="location-pin" />
+                        </View>
+                        <TextInput
+                            numberOfLines = {1}
+                            maxLength = {20}
+                            placeholder = "Event's Location"
+                            placeholderTextColor = '#555'
+                            style={{color : '#333', borderWidth : 0.2, flex : 1, padding : 0, paddingLeft : 5, borderColor : '#888', borderRadius : 5, fontSize : 15}}
+                            autoCapitalize = 'sentences'
+                            keyboardType = 'default'
+                            keyboardAppearance = 'light'
+                            value = {location}
+                            onChangeText = {val=>this.setState({location : val})}
+                        />
+                    </View>
+
+                    <View style={{flexDirection : 'row', margin : 5, padding : 5,}}>
+                        <TouchableOpacity style={{
+                            marginRight: 5,
+                            width: 50,
+                            paddingTop: 5,
+                            paddingBottom: 5,
+                            borderRadius: 5
                             }}
-                         />
-                    </ScrollView>
-                </KeyboardAvoidingView>
-              <DateTimePicker
-                  isVisible={this.state.isDateTimePickerVisible}
-                  mode={this.state.picker === 'time' ? 'time' : 'date'}
-                  onConfirm={this._handleDatePicked}
-                  onCancel={this._hideDateTimePicker}
+                            onPress={()=>this._showDateTimePicker('time')}
+                        >
+                            <Icon3 style={{ alignSelf: 'center', color: '#514A9D', }} size={35} name="clock" />
+                        </TouchableOpacity>
+                        <TextInput
+                            numberOfLines = {1}
+                            editable = {false}
+                            maxLength = {20}
+                            onTouchStart = {()=>this._showDateTimePicker('time')}
+                            placeholder = "Event's Time"
+                            placeholderTextColor = '#555'
+                            style={{color : '#333', borderWidth : 0.2, flex : 1, padding : 0, paddingLeft : 5, borderColor : '#888', borderRadius : 5, fontSize : 15}}
+                            autoCapitalize = 'sentences'
+                            keyboardType = 'default'
+                            keyboardAppearance = 'light'
+                            value = {formatAMPM(time)}
+                        />
+                    </View>
+
+                    <View style={{flexDirection : 'row', margin : 5, padding : 5}}>
+                        <View style={{
+                            marginRight: 5,
+                            width: 50,
+                            paddingTop: 5,
+                            paddingBottom: 5,
+                            borderRadius: 5
+                        }}>
+                            <Icon2 style={{ alignSelf: 'center', color: '#514A9D', }} size={35} name="text" />
+                        </View>
+                        <TextInput
+                            multiline = {true}
+                            maxLength = {800}
+                            placeholder = "Tell us about the event."
+                            placeholderTextColor = '#555'
+                            style={{color : '#333', borderWidth : 0.2, flex : 1, padding : 0, paddingLeft : 5, borderColor : '#888', borderRadius : 5, fontSize : 15, minHeight : 100}}
+                            autoCapitalize = 'sentences'
+                            keyboardType = 'default'
+                            keyboardAppearance = 'light'
+                            value = {description}
+                            onChangeText = {val=>this.setState({description : val})}
+                        />
+                    </View>
+
+                    <View style={{flexDirection : 'row', margin : 5, padding : 5}}>
+                        <View style={{
+                            marginRight: 5,
+                            width: 50,
+                            paddingTop: 5,
+                            paddingBottom: 5,
+                            borderRadius: 5
+                        }}>
+                            <Icon style={{ alignSelf: 'center', color: '#514A9D', }} size={35} name="ios-call" />
+                        </View>
+                        <TextInput
+                            numberOfLines = {1}
+                            maxLength = {80}
+                            placeholder = "Contact Details with name in brackets"
+                            placeholderTextColor = '#555'
+                            style={{color : '#333', borderWidth : 0.2, flex : 1, padding : 0, paddingLeft : 5, borderColor : '#888', borderRadius : 5, fontSize : 15,}}
+                            autoCapitalize = 'sentences'
+                            keyboardType = 'default'
+                            keyboardAppearance = 'light'
+                            value = {contact_details}
+                            onChangeText = {val=>this.setState({contact_details : val})}
+                        />
+                    </View>
+
+                    <View style={{flexDirection : 'row', margin : 5, padding : 5}}>
+                        <View style={{
+                            marginRight: 5,
+                            width: 50,
+                            paddingTop: 5,
+                            paddingBottom: 5,
+                            borderRadius: 5
+                        }}>
+                            <Icon4 style={{ alignSelf: 'center', color: '#514A9D', }} size={35} name="comment-question" />
+                        </View>
+                        <TextInput
+                            multiline = {true}
+                            maxLength = {1000}
+                            placeholder = "FAQ's & more  (optional)"
+                            placeholderTextColor = '#555'
+                            style={{color : '#333', borderWidth : 0.2, flex : 1, padding : 0, paddingLeft : 5, borderColor : '#888', borderRadius : 5, fontSize : 15, minHeight : 100}}
+                            autoCapitalize = 'sentences'
+                            keyboardType = 'default'
+                            keyboardAppearance = 'light'
+                            value = {faq}
+                            onChangeText = {val=>this.setState({faq : val})}
+                        />
+                    </View>
+
+                    <View style={{flexDirection : 'row', margin : 5, padding : 5}}>
+                        <View style={{
+                            marginRight: 5,
+                            width: 50,
+                            paddingTop: 5,
+                            paddingBottom: 5,
+                            borderRadius: 5
+                        }}>
+                            <Icon style={{ alignSelf: 'center', color: '#514A9D', }} size={35} name="md-link" />
+                        </View>
+                        <TextInput
+                            numberOfLines = {1}
+                            maxLength = {100}
+                            placeholder = "Registration Link  (optional)"
+                            placeholderTextColor = '#555'
+                            style={{color : '#333', borderWidth : 0.2, flex : 1, padding : 0, paddingLeft : 5, borderColor : '#888', borderRadius : 5, fontSize : 15,}}
+                            autoCapitalize = 'sentences'
+                            keyboardType = 'default'
+                            keyboardAppearance = 'light'
+                            value = {reg_link}
+                            onChangeText = {val=>this.setState({reg_link : val})}
+                        />
+                    </View>
+
+                    <View style={{flexDirection : 'row', margin : 5, padding : 5}}>
+                        <View style={{
+                            marginRight: 5,
+                            width: 50,
+                            paddingTop: 5,
+                            paddingBottom: 5,
+                            borderRadius: 5
+                        }}>
+                            <Icon style={{ alignSelf: 'center', color: '#514A9D', }} size={35} name="md-pricetag" />
+                        </View>
+                        <FlatList
+                            showsHorizontalScrollIndicator = {false}
+                            style={{borderWidth : 0.2, flex : 1, padding : 0, paddingLeft : 5, borderColor : '#888', borderRadius : 5,}}
+                            data = {interests}
+                            extraData = {this.state}
+                            keyExtractor={(item, index) => `${index}`}
+                            horizontal
+                            renderItem={({ item }) => 
+                                <AdvertCard
+                                    width={80}
+                                    height={80}
+                                    clickable = {true}
+                                    checked = { this.state.category === item.value ? true : false}
+                                    onChecked = {()=>this.setState({category : item.value})}
+                                    image={item.image}
+                                    text={item.title}
+                                />
+                            }
+                        />
+                    </View>
+
+                    <View style={{flexDirection : 'row', margin : 5, padding : 5}}>
+                        <View style={{
+                            marginRight: 5,
+                            paddingTop: 5,
+                            marginLeft : 10,
+                            paddingBottom: 5,
+                            borderRadius: 5
+                        }}>
+                            <Text style={{fontSize : 12, marginTop : 5, color : '#555'}}>
+                            {
+                                'We suggest you to check these details thoroughly as these details cannot be changed easily.\n\n' +
+                                'Please use default registration form of the app as user tends to regitser in such events more frequently rather than google forms and other links.'
+                            }
+                            </Text>
+                        </View>
+                    </View>
+
+                </ScrollView>
+                <DateTimePicker
+                    minimumDate = {new Date()}
+                    isVisible={this.state.isDateTimePickerVisible}
+                    mode={this.state.picker === 'time' ? 'time' : 'date'}
+                    onConfirm={this._handleDatePicked}
+                    onCancel={this._hideDateTimePicker}
                 />
             </View>
-      );
+        );
     }
 }
 
-export default createEventScreen;
+export default CreateEventScreen;

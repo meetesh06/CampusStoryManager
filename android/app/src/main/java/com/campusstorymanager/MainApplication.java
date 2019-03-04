@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Intent;
 
 import com.facebook.react.ReactApplication;
+import com.microsoft.codepush.react.CodePush;
 import com.cmcewen.blurview.BlurViewPackage;
 import io.realm.react.RealmReactPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
@@ -55,8 +56,13 @@ public class MainApplication extends NavigationApplication implements OnImagePic
             ReactNativeHost host = new NavigationReactNativeHost(this, isDebug(), createAdditionalReactPackages()) {
             @Override
             protected String getJSMainModuleName() {
-                        return "index";
-                    }
+                return "index";
+            }
+
+            @Override
+            protected String getJSBundleFile() {
+                return CodePush.getJSBundleFile();
+            }
         };
             return new ReactGateway(this, isDebug(), host);
         }
@@ -68,7 +74,7 @@ public class MainApplication extends NavigationApplication implements OnImagePic
 
     protected List<ReactPackage> getPackages() {
         return Arrays.<ReactPackage>asList(
-                    new LinearGradientPackage()
+                new LinearGradientPackage()
                 ,new VectorIconsPackage()
                 ,new FastImageViewPackage()
                 ,new ImagePickerPackage()
@@ -79,6 +85,7 @@ public class MainApplication extends NavigationApplication implements OnImagePic
                 ,new MkaerVideoPickerPackage()
                 ,new RNFileViewerPackage()
                 ,new RealmReactPackage()
+                ,new CodePush("pbYZHXQzHzXWda7aHGCwfbSuZMeKefea177c-2876-4bb3-b267-0f984d263df9", MainApplication.this, BuildConfig.DEBUG)
     );
         }
 

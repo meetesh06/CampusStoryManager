@@ -2,12 +2,14 @@ import React from 'react';
 import { View, TouchableOpacity, TextInput, Text } from 'react-native';
 import Icon2 from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
+import Icon3 from 'react-native-vector-icons/MaterialCommunityIcons';
 
 class PostEditor extends React.Component {
     state = {
         type_color : 1,
         type_font : 'Regular',
-        message : ''
+        message : '',
+        reaction_type : { name : 'Clap', value : '👏', type : 1}
     }
 
     getColors = (type) =>{
@@ -19,6 +21,30 @@ class PostEditor extends React.Component {
             default : arr = ['#0056e5', '#85f5ff'];break;
         }
         return arr;
+    }
+
+    resetReaction = ()=>{
+        this.setState({reaction_type : { name : 'Clap', value : '👏', type : 1}});
+    }
+
+    changeReaction = () =>{
+        const {reaction_type}  = this.state;
+        switch(reaction_type.type){
+            case 6 : return this.setState({reaction_type : { name : 'Clap', value : '👏', type : 1}});
+            case 1 : return this.setState({reaction_type : { name : 'Superb', value : '👌', type : 2}});
+            case 2 : return this.setState({reaction_type : { name : 'Love', value : '😍', type : 3}});
+            case 3 : return this.setState({reaction_type : { name : 'Hot', value : '🔥', type : 4}});
+            case 4 : return this.setState({reaction_type : { name : 'Haha', value : '😂', type : 5}});
+            case 5 : return this.setState({reaction_type : { name : 'Yummy', value : '😋', type : 6}});
+            default : return this.setState({reaction_type : { name : 'Clap', value : '👏', type : 1}});
+        }
+    }
+
+    exportData = () =>{
+        const { type_color, type_font, message, reaction_type } = this.state;
+        const mssg = message.trim();
+        const empty = mssg.length > 4 ? false : true;
+        return {type_color, type_font, message : mssg, reaction_type, type : 'Post', empty};
     }
 
     getColorName = (type) =>{
@@ -50,7 +76,7 @@ class PostEditor extends React.Component {
 
     render() {
         const {
-            type_color, type_font, message
+            type_color, type_font, message, reaction_type
         } = this.state;
         return(
         <View style={{flex : 1, backgroundColor : '#eee'}}>
@@ -81,6 +107,25 @@ class PostEditor extends React.Component {
                 </TouchableOpacity>
 
             </View>
+
+            <View style={{position : 'absolute', bottom : 10, left : 0, padding : 5, margin : 5, flexDirection : 'row'}}>
+                <TouchableOpacity style = {{flexDirection : 'row', justifyContent : 'center', alignItems : 'center',}} onPress = {this.changeReaction}>
+                    <View style={{width : 40, height : 40, borderRadius : 40, padding : 3, backgroundColor : 'rgba(255, 255, 255, 0.4)', justifyContent : 'center', alignItems : 'center'}}>
+                        <Text style={{fontSize : 30, textAlign : 'center',}}>{reaction_type.value}</Text>
+                    </View>
+                    <Text style={{color : '#fff', fontSize : 14}}>{' '  + reaction_type.name}</Text>
+                </TouchableOpacity>
+                
+                <View style={{flex : 1}} />
+
+                <TouchableOpacity style = {{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}} onPress = {this.resetReaction}>
+                    <Text style={{color : '#fff', fontSize : 14}}>{'Reset Reaction  '}</Text>
+                    <View style={{width : 25, height : 25, borderRadius : 30, padding : 3, backgroundColor : 'rgba(255, 255, 255, 0.4)', justifyContent : 'center', alignItems : 'center'}}>
+                        <Icon3 name = 'replay' size = {20} color = '#fff' />
+                    </View>
+                </TouchableOpacity>
+            </View>
+
                 <TextInput
                     multiline = {true}
                     maxLength = {250}

@@ -2,13 +2,16 @@ import React from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/Entypo';
 import Icon2 from 'react-native-vector-icons/Ionicons';
+import Icon3 from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImagePicker from 'react-native-image-picker';
 import FastImage from 'react-native-fast-image';
 
 class ImageEditor extends React.Component {
     state = {
-        message : '',
         imageURI : '',
+        imageType : '',
+        imageName : '',
+        reaction_type : { name : 'Clap', value : '👏', type : 1}
     }
 
     openImagePicker = () =>{
@@ -29,14 +32,38 @@ class ImageEditor extends React.Component {
             } else if (response.customButton) {
                 console.log('CUSTOM ACTION');
             } else {
-                this.setState({imageURI : response.uri});
+                this.setState({imageURI : response.uri, imageType : response.type, imageName : response.fileName});
             }
         });
     }
 
+    exportData = () =>{
+        const { imageURI, imageType, imageName, reaction_type} = this.state;
+        const empty = imageURI !== '' ? false : true;
+        return {imageURI, imageType, imageName, reaction_type, type : 'Image', empty};
+    }
+
+    resetReaction = ()=>{
+        this.setState({reaction_type : { name : 'Clap', value : '👏', type : 1}});
+    }
+
+    changeReaction = () =>{
+        const {reaction_type}  = this.state;
+        switch(reaction_type.type){
+            case 6 : return this.setState({reaction_type : { name : 'Clap', value : '👏', type : 1}});
+            case 1 : return this.setState({reaction_type : { name : 'Superb', value : '👌', type : 2}});
+            case 2 : return this.setState({reaction_type : { name : 'Love', value : '😍', type : 3}});
+            case 3 : return this.setState({reaction_type : { name : 'Hot', value : '🔥', type : 4}});
+            case 4 : return this.setState({reaction_type : { name : 'Haha', value : '😂', type : 5}});
+            case 5 : return this.setState({reaction_type : { name : 'Yummy', value : '😋', type : 6}});
+            default : return this.setState({reaction_type : { name : 'Clap', value : '👏', type : 1}});
+        }
+    }
+
     render() {
         const {
-            imageURI
+            imageURI,
+            reaction_type
         } = this.state;
         return(
             <View style={{flex : 1, justifyContent : 'center'}}>
@@ -63,12 +90,12 @@ class ImageEditor extends React.Component {
                             }}
                             resizeMode={FastImage.resizeMode.contain}
                         >
-                            <View style={{position : 'absolute', top : 10, left : 0, padding : 5, margin : 5, flexDirection : 'row'}}>
+                        <View style={{position : 'absolute', top : 10, left : 0, padding : 5, margin : 5, flexDirection : 'row'}}>
                             <TouchableOpacity style = {{flexDirection : 'row', justifyContent : 'center', alignItems : 'center',}} onPress = {()=>this.setState({imageURI : ''})}>
-                                <Text style={{color : '#fff', fontSize : 14}}>{'Remove  '}</Text>
                                 <View style={{width : 25, height : 25, borderRadius : 30, padding : 3, backgroundColor : 'rgba(255, 255, 255, 0.4)', justifyContent : 'center', alignItems : 'center'}}>
                                     <Icon2 name = 'md-close-circle' size = {20} color = '#fff' />
                                 </View>
+                                <Text style={{color : '#fff', fontSize : 14}}>{'  Remove'}</Text>
                             </TouchableOpacity>
                             
                             <View style={{flex : 1}} />
@@ -80,6 +107,25 @@ class ImageEditor extends React.Component {
                                 </View>
                             </TouchableOpacity>
                         </View>
+
+                        <View style={{position : 'absolute', bottom : 10, left : 0, padding : 5, margin : 5, flexDirection : 'row'}}>
+                            <TouchableOpacity style = {{flexDirection : 'row', justifyContent : 'center', alignItems : 'center',}} onPress = {this.changeReaction}>
+                                <View style={{width : 40, height : 40, borderRadius : 40, padding : 3, backgroundColor : 'rgba(255, 255, 255, 0.4)', justifyContent : 'center', alignItems : 'center'}}>
+                                    <Text style={{fontSize : 30, textAlign : 'center',}}>{reaction_type.value}</Text>
+                                </View>
+                                <Text style={{color : '#fff', fontSize : 14}}>{' '  + reaction_type.name}</Text>
+                            </TouchableOpacity>
+                            
+                            <View style={{flex : 1}} />
+
+                            <TouchableOpacity style = {{flexDirection : 'row', justifyContent : 'center', alignItems : 'center'}} onPress = {this.resetReaction}>
+                                <Text style={{color : '#fff', fontSize : 14}}>{'Reset Reaction  '}</Text>
+                                <View style={{width : 25, height : 25, borderRadius : 30, padding : 3, backgroundColor : 'rgba(255, 255, 255, 0.4)', justifyContent : 'center', alignItems : 'center'}}>
+                                    <Icon3 name = 'replay' size = {20} color = '#fff' />
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+
                         </FastImage>
                     </View>
                 }

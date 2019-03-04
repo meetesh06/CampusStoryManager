@@ -12,6 +12,7 @@ class videoModalScreen extends React.Component {
         super(props);
         this.handleDone = this.handleDone.bind(this);
     }
+
     state = {
         uri: null,
         loading: false,
@@ -22,23 +23,34 @@ class videoModalScreen extends React.Component {
         sliderOneValue: [5],
         multiSliderValue: [3, 7],
         error: false,
-        mssg: ""
+        mssg: "",
+        VIDEO_LENGTH_LIMIT : 15
     }
     
     multiSliderValuesChange = values => {
         let error = false;
-        if((values[1] - values[0]) > 10) {
+        if((values[1] - values[0]) > this.state.VIDEO_LENGTH_LIMIT) {
             error = true;
         }
         
-        this.setState({
-            multiSliderValue: values,
-            error,
-            paused: true
-        }, () => this.videoPlayer.seek(values[0]));
+        if(this.state.multiSliderValue[0] !== values[0]){
+            this.setState({
+                multiSliderValue: values,
+                error,
+                paused: true
+            }, () => this.videoPlayer.seek(values[0]));
+        }
+
+        if(this.state.multiSliderValue[1] !== values[1]){
+            this.setState({
+                multiSliderValue: values,
+                error,
+                paused: true
+            }, () => this.videoPlayer.seek(values[1]));
+        }
     };
+
     handleDone = () => {
-        // do the compression here
         this.setState({ loading: true });
         NativeModules.MkaerVideoPicker.compress(this.state.multiSliderValue[0] * 1000, this.state.multiSliderValue[1] * 1000, (data) => {
             data = JSON.parse(data);
@@ -49,13 +61,10 @@ class videoModalScreen extends React.Component {
             } else {
                 this.setState({ loading: false });
                 Alert.alert("Error compressing the video");
-                // this.props.completedEditing(true);
-                // Navigation.dismissModal(this.props.componentId)
             }
         });
     }
     render() {
-        console.log(this.state.position);
         return(
             <View
                 style={{
@@ -101,28 +110,25 @@ class videoModalScreen extends React.Component {
                 >
                     <MultiSlider
                         initialValues={(vals) => setTimeout(() => this.videoPlayer.seek(vals[0]), 500)}
-                        // initialValues={(vals) => this.setState({  })}
                         values={[
                             this.state.multiSliderValue[0],
                             this.state.multiSliderValue[1],
                         ]}
                         selectedStyle={{
                             backgroundColor: this.state.error ? 'red' : 'green',
+                            height : 30,
                         }}
                         unselectedStyle={{
                             backgroundColor: 'silver',
+                            height : 30
                         }}
-                        // containerStyle={{
-                        //     height: 40,
-                        // }}
-                        trackStyle={{
-                            // height: 10,
-                            // backgroundColor: 'red',
-                        }}
-                
-                        sliderLength={WIDTH - 40}
+                        containerStyle = {{margin : 10}}
+                        touchDimension = {{height: 50,width: 50,borderRadius: 15,slipDisplacement: 200}}
+                        sliderLength={WIDTH - 20}
+                        step = {this.state.duration / WIDTH}
                         onValuesChange={this.multiSliderValuesChange}
                         min={0}
+                        isMarkersSeparated = {true}
                         max={this.state.duration}
                     />
                 </View>
@@ -157,8 +163,6 @@ class videoModalScreen extends React.Component {
                 <View
                     style={{
                         height: 50,
-                        // flex: 1,
-                        // backgroundColor: 'red',
                         flexDirection: 'row'
                     }}
                 >
