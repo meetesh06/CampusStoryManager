@@ -276,9 +276,9 @@ class UpdateEventScreen extends React.Component {
         const values = [];
         enrollees.forEach( (value) => {
             console.log(value.name);
-            values.push([value.email, value.phone, value.name, 'true']);
+            values.push([value.email, value.phone, value.name]);
         });
-
+        Alert.alert(JSON.stringify(values));
         const headerString = 'E-mail ID,Phone Number,Full Name\n';
         const rowString = values.map(d => `${d[0]},${d[1]},${d[2]}\n`).join('');
         const csvString = `${headerString}${rowString}`;
