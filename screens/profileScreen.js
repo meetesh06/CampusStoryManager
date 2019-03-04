@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Linking, RefreshControl } from 'react-native';
+import { Alert, View, Text, ScrollView, TouchableOpacity, Linking, RefreshControl } from 'react-native';
 import SessionStore from '../SessionStore';
 import constants from '../constants';
 import FastImage from 'react-native-fast-image';
@@ -26,13 +26,13 @@ class ProfileScreen extends React.Component {
 
     setData = () =>{
         const user_data = new SessionStore().getValue(constants.USER_DATA);
-        const media = user_data.media ? user_data.media[0] : '';
+        const media = user_data.media ? user_data.media[0] : 'CampusStoryLogo.fea71e00.svg';
         channel_data = {
             _id : user_data.channel,
             name : user_data.name,
             description : user_data.description,
             followers : user_data.followers,
-            media : urls.PREFIX + '/' + media,
+            media : 'https://mycampusdock.com/logo.png',
             private : user_data.private,
             reactions : user_data.reactions,
             social_link  :user_data.social_link,
@@ -91,7 +91,7 @@ class ProfileScreen extends React.Component {
                             backgroundColor : '#bbb',
                             borderRadius: 110,
                             }}
-                            source={{uri : encodeURI(channel_data.media)}}
+                            source={{uri : encodeURI(channel_data.media) === "undefined" ? 'https://mycampusdock.com/logo.png' : encodeURI(channel_data.media) }}
                             resizeMode={FastImage.resizeMode.cover}
                         />
                     </View>

@@ -99,7 +99,7 @@ class UpdateChannelScreen extends React.Component {
                                 'Use good words, keep it simple & short, & describe about the content you are going to share here.'
                             }
                         </Text>
-                        <View style={{flexDirection : 1, marginTop : 20}} />
+                        <View style={{flex : 1, marginTop : 20}} />
                         <TextInput 
                             placeholder = 'Your Social Plugin Link'
                             placeholderTextColor = '#555'

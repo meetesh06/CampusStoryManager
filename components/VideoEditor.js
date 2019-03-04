@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, Platform, Text } from 'react-native';
+import { RNFetchBlob, Alert, NativeModules, View, TouchableOpacity, Platform, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/Entypo';
 import Icon2 from 'react-native-vector-icons/Ionicons';
 import Icon3 from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -32,6 +32,7 @@ class VideoEditor extends React.Component {
         if (Platform.OS === "android") {
             NativeModules.MkaerVideoPicker.openPicker()
                 .then((data) => {
+                    // Alert.alert(JSON.stringify(data));
                     data = JSON.parse(data);
                     console.log(data);
                     Navigation.showModal({
@@ -53,7 +54,10 @@ class VideoEditor extends React.Component {
                           }]
                         }
                     });
-                });
+                })
+                .catch(err => {
+                    Alert.alert(JSON.stringify(err));
+                })
         } else {
             ImagePicker.launchImageLibrary(options, (response) => {
                 if (response.didCancel) {
@@ -70,19 +74,19 @@ class VideoEditor extends React.Component {
     }
 
     completedEditing = (err, data) => {
-        if(err) return;
-        RNFetchBlob.fs.readStream(data, 'utf8')
-            .then((stream) => {
-                let data = ''
-                stream.open()
-                stream.onData((chunk) => {
-                    data += chunk
-                })
-                stream.onEnd(() => {
-                    console.log(data)
-                })
-            })
-            .catch(err => console.log(err))
+        if (err) return;
+        // RNFetchBlob.fs.readStream(data, 'utf8')
+        //     .then((stream) => {
+        //         let data = ''
+        //         stream.open()
+        //         stream.onData((chunk) => {
+        //             data += chunk
+        //         })
+        //         stream.onEnd(() => {
+        //             console.log(data)
+        //         })
+        //     })
+        //     .catch(err => Alert.alert(JSON.stringify(err)))
         this.setState({videoURI: data});
     }
 
@@ -130,7 +134,7 @@ class VideoEditor extends React.Component {
                     <View>
                         <Video
                             repeat = {true}
-                            source={{uri: encodeURI(videoURI)}}
+                            source={{uri: videoURI}}
                             style={{
                                 height : '100%',
                                 width : '100%'

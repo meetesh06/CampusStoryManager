@@ -118,7 +118,29 @@ public class MkaerVideoPicker extends ReactContextBaseJavaModule {
         int width = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
         int height = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
 
-        String[] complexCommand = {"-ss", "" + start / 1000, "-y", "-i", this.uri, "-t", "" + (end - start) / 1000, "-s", width+"x"+height, "-r", "15", "-vcodec", "mpeg4", "-b:v", "2097152", "-b:a", "48000", "-ac", "2", "-ar", "22050", compressedUri };
+        String[] complexCommand = {
+            "-i", this.uri,
+            "-ss", "" + start / 1000,
+            "-t", "" + (end - start) / 1000,
+            "-s", width+"x"+height,
+            "-preset", "ultrafast",
+            compressedUri
+        };
+//        String[] complexCommand = {
+//                "-ss", "" + start / 1000,
+//                "-y",
+//                "-i", this.uri,
+//                "-t", "" + (end - start) / 1000,
+//                "-s", width+"x"+height,
+//                "-r", "15",
+//                "-preset", "ultrafast",
+//                "-vcodec", "mpeg4",
+//                "-b:v", "2097152",
+//                "-b:a", "48000",
+//                "-ac", "2",
+//                "-ar", "22050",
+//                compressedUri
+//        };
         this.execFFmpegBinary(complexCommand, Uri.fromFile(new File(compressedUri)).toString(), callback);
     }
 

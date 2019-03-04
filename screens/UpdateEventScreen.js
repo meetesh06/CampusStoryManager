@@ -276,11 +276,11 @@ class UpdateEventScreen extends React.Component {
         const values = [];
         enrollees.forEach( (value) => {
             console.log(value.name);
-            values.push([ value.email, value.phone, value.name, 'true' ])
+            values.push([value.email, value.phone, value.name, 'true']);
         });
 
-        const headerString = 'E-mail ID,Phone Number,Full Name, Registered\n';
-        const rowString = values.map(d => `${d[0]},${d[1]}\n`).join('');
+        const headerString = 'E-mail ID,Phone Number,Full Name\n';
+        const rowString = values.map(d => `${d[0]},${d[1]},${d[2]}\n`).join('');
         const csvString = `${headerString}${rowString}`;
         
         const pathToWrite = `${RNFetchBlob.fs.dirs.DocumentDir}/${this.props.data.title.replace(/[\W_]+/g, "")}.csv`;

@@ -32,7 +32,7 @@ class Home extends React.Component {
         stats : {channel_visits : '' , action_taken : '', reactions : ''}
     };
 
-    componentDidMount(){
+    componentDidMount() {
         this.refresh();
     }
 
@@ -97,6 +97,7 @@ class Home extends React.Component {
             const responseObject = response.data;
             console.log(responseObject);
             if (!responseObject.error) {
+                // Alert.alert(JSON.stringify(responseObject.data.length));
                 Realm.getRealm((realm) => {
                     Object.entries(responseObject.data).forEach(([key, el] ) => {
                         el.reach = JSON.stringify(el.reach);

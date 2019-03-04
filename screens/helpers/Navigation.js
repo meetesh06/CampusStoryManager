@@ -63,7 +63,7 @@ export const goHome = async () => {
   const homeIcon = await Icon1.getImageSource('home', 24);
   const createIcon = await Icon.getImageSource('pluscircle', 24);
   const profileIcon = await Icon2.getImageSource('user-tie', 24);
-  
+
   return Navigation.setRoot({
     root: {
       bottomTabs: {
@@ -73,10 +73,10 @@ export const goHome = async () => {
             stack: {
               id: "Home Stack",
               options: {
-                topBar: {
-                  visible: false,
-                  drawBehind: true,
-                },
+                // topBar: {
+                //   visible: false,
+                //   drawBehind: true,
+                // },
                 bottomTab: {
                   fontSize: 10,
                   selectedFontSize: 12,
@@ -113,10 +113,10 @@ export const goHome = async () => {
             stack: {
               id: "Create Stack",
               options: {
-                topBar: {
-                  visible: false,
-                  drawBehind: true,
-                },
+                // topBar: {
+                //   visible: false,
+                //   drawBehind: true,
+                // },
                 bottomTab: {
                   fontSize: 10,
                   selectedFontSize: 12,
@@ -153,10 +153,10 @@ export const goHome = async () => {
             stack: {
               id: "Profile Stack",
               options: {
-                topBar: {
-                  visible: false,
-                  drawBehind: true,
-                },
+                // topBar: {
+                //   visible: false,
+                //   drawBehind: true,
+                // },
                 bottomTab: {
                   fontSize: 10,
                   selectedFontSize: 12,

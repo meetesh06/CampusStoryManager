@@ -25,6 +25,7 @@ class ImageEditor extends React.Component {
         };
 
         ImagePicker.launchImageLibrary(options, (response) => {
+            // Alert.alert(JSON.stringify(response.uri));
             if (response.didCancel) {
                 console.log('CANCELED');
             } else if (response.error) {
@@ -82,7 +83,8 @@ class ImageEditor extends React.Component {
                     <View>
                         <FastImage 
                             source={{
-                                uri: encodeURI(imageURI)
+                                // uri: encodeURI(imageURI)
+                                uri: imageURI
                             }}
                             style={{
                                 height : '100%',

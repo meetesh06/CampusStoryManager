@@ -33,14 +33,17 @@ class SettingsScreen extends React.Component {
         });
     }
 
-    logout = () =>{
+    logout = () => {
+        
         Realm.getRealm((realm)=>{
           realm.write(async () => {
             realm.deleteAll();
             await new SessionStore().reset();
+            Navigation.dismissModal(this.props.componentId);
             goInitializing();
           });
         });
+        
     }
 
     render() {
