@@ -31,6 +31,14 @@ class ManageModerators extends React.Component {
                         <Text style={{fontSize : 15, textAlign : 'center', margin : 5, width : 50, color : 'blue'}}>Done</Text>
                     </TouchableOpacity>
                 </View>
+
+                <View style={{flex : 1 , backgroundColor : '#efefef'}}>
+                <Text style={{textAlign : 'center', fontSize : 15, color : "#333", margin : 10}}>
+                {
+                    'You wil be able to create sub accounts for your moderators!'
+                }
+                </Text>
+                </View>
             </View>
         );
     }

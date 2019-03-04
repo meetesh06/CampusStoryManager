@@ -335,9 +335,9 @@ class UpdateEventScreen extends React.Component {
                         }
                         {
                             imageURI.length > 0 && 
-                            <FastImage 
+                            <FastImage
                                 source={{
-                                    uri: encodeURI(imageURI)
+                                    uri: imageURI
                                 }}
                                 style={{
                                     height : 220,

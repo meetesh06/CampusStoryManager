@@ -83,7 +83,6 @@ class ImageEditor extends React.Component {
                     <View>
                         <FastImage 
                             source={{
-                                // uri: encodeURI(imageURI)
                                 uri: imageURI
                             }}
                             style={{

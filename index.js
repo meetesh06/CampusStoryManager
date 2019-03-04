@@ -2,9 +2,9 @@ import {Platform, AppState} from 'react-native';
 import { Navigation } from "react-native-navigation";
 import Initializing from "./screens/Initializing";
 import Home from "./screens/Home";
-import CreateEventScreen from "./screens/createEventScreen";
+import CreateEventScreen from "./screens/CreateEventScreen";
 import videoModalScreen from "./screens/videoModalScreen";
-import ProfileScreen from "./screens/profileScreen";
+import ProfileScreen from "./screens/ProfileScreen";
 import StoryScreen from "./screens/StoryScreen";
 import SubmitStory from "./screens/SubmitStory";
 import SettingsScreen from "./screens/SettingsScreen";
@@ -65,17 +65,30 @@ Navigation.events().registerAppLaunchedListener(async () => {
   this.init();
 });
 
+submission = async () =>{
+  // const ts = new SessionStore().getValueTemp(Constants.APP_USAGE_TIME);
+  // const cs = new Date().getTime();
+  // const timespent = (cs - ts) /1000;
+  // if(timespent > 60){
+  //   new SessionStore().pushTrack({timespent, type : Constants.APP_USAGE_TIME});
+  // } else {
+  //   new SessionStore().putValueTemp(Constants.TRACKS, []);
+  // }
+  // new SessionStore().putValueTemp(Constants.APP_USAGE_TIME, cs);
+  await new SessionStore().setValueBulk();
+}
+
 onAppStateChanged = (nextAppState) => {
   if (this.state.appState.match(/inactive|background/) && nextAppState === 'active'){
     console.log('Background - Forground');
   } else if(nextAppState === 'background') {
     console.log('Background');
-    // if(Platform.OS === 'android') this.submission();
+    if(Platform.OS === 'android') this.submission();
   } else if(nextAppState === 'active'){
     console.log('Forground');
   } else if(nextAppState === 'inactive'){
     console.log('Inactive');
-    // if(Platform.OS === 'ios') this.submission();
+    if(Platform.OS === 'ios') this.submission();
   }
   this.state.appState = nextAppState;
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, StatusBar, Platform, View, TextInput, TouchableOpacity } from 'react-native';
+import { Text, StatusBar, Platform, View, Alert, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Icon2 from 'react-native-vector-icons/FontAwesome';
 import Icon3 from 'react-native-vector-icons/FontAwesome5';
@@ -34,16 +34,27 @@ class SettingsScreen extends React.Component {
     }
 
     logout = () => {
-        
-        Realm.getRealm((realm)=>{
-          realm.write(async () => {
-            realm.deleteAll();
-            await new SessionStore().reset();
-            Navigation.dismissModal(this.props.componentId);
-            goInitializing();
-          });
-        });
-        
+        Alert.alert(
+            'Logout',
+            'Are you sure you want to logout? You have to login again to use the app.',
+            [
+                {
+                text: 'Cancel',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel',
+                },
+                {text: 'Logout', onPress: () => {
+                    Realm.getRealm((realm)=>{
+                        realm.write(async () => {
+                          realm.deleteAll();
+                          await new SessionStore().reset();
+                          Navigation.dismissModal(this.props.componentId);
+                          goInitializing();
+                        });
+                    });
+                }},
+            ]
+        );
     }
 
     render() {
@@ -74,7 +85,7 @@ class SettingsScreen extends React.Component {
                                 Change details about you channel.
                             </Text>
                         </View>
-                        <Icon2 name = 'square' size = {25} color = '#333' />
+                        <Icon2 name = 'square' size = {25} color = '#514A9D' />
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{flexDirection : 'row', padding : 10, marginTop : 5, backgroundColor : '#fff'}} activeOpacity = {0.7} onPress = {()=>this.gotoScreen('Manage Moderators')}>
@@ -86,7 +97,7 @@ class SettingsScreen extends React.Component {
                                 Add or remove a moderator for channel.
                             </Text>
                         </View>
-                        <Icon3 name = 'users-cog' size = {25} color = '#333' />
+                        <Icon3 name = 'users-cog' size = {25} color = '#514A9D' />
                     </TouchableOpacity>
 
                     <TouchableOpacity style={{flexDirection : 'row', padding : 10, marginTop : 5, backgroundColor : '#fff'}} activeOpacity = {0.7} onPress = {this.logout}>
@@ -98,7 +109,7 @@ class SettingsScreen extends React.Component {
                                 Logout from this session.
                             </Text>
                         </View>
-                        <Icon3 name = 'user-shield' size = {25} color = '#333' />
+                        <Icon3 name = 'user-shield' size = {25} color = '#514A9D' />
                     </TouchableOpacity>
                 </View>
             </View>

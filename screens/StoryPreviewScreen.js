@@ -71,10 +71,10 @@ class StoryScreen extends React.Component {
           current,
           stories
         } = this.state;
-        if (gestureState.x0 > 0 && gestureState.x0 < WIDTH / 4) {
+        if (gestureState.x0 > 0 && gestureState.x0 < WIDTH / 3) {
           if (current === stories.length - 1) console.log('DO NOTHING')
           else this.setState({ current: current + 1 });
-        } else if (gestureState.x0 > (WIDTH * 3) / 4) {
+        } else if (gestureState.x0 > (WIDTH * 2) / 3) {
           if (current === 0)this.close();
           else this.setState({ current: current - 1 });
         // eslint-disable-next-line no-sequences

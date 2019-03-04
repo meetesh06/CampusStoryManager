@@ -3,6 +3,7 @@ import { Alert, View, Text, ScrollView, TouchableOpacity, Linking, RefreshContro
 import SessionStore from '../SessionStore';
 import constants from '../constants';
 import FastImage from 'react-native-fast-image';
+import {getCategoryName} from './helpers/functions'
 import Icon2 from 'react-native-vector-icons/MaterialIcons';
 import Icon1 from 'react-native-vector-icons/FontAwesome5';
 import axios from 'axios';
@@ -20,21 +21,27 @@ class ProfileScreen extends React.Component {
     }
 
     componentDidMount() {
-        this.setData();
-        this.fetchChannel();
+        const is_first_time = new SessionStore().getValue(constants.IS_FIRST_TIME);
+        if(is_first_time){
+            new SessionStore().putValue(constants.IS_FIRST_TIME, false);
+            this.fetchChannel(); 
+        } else {
+            const user_data = new SessionStore().getValue(constants.USER_DATA);
+            this.setData(user_data);
+        }
     }
 
-    setData = () =>{
-        const user_data = new SessionStore().getValue(constants.USER_DATA);
-        const media = user_data.media ? user_data.media[0] : 'CampusStoryLogo.fea71e00.svg';
+    setData = (user_data) =>{
+        const media = user_data.media ? user_data.media[0] : 'logo.png';
         channel_data = {
             _id : user_data.channel,
             name : user_data.name,
             description : user_data.description,
             followers : user_data.followers,
-            media : 'https://mycampusdock.com/logo.png',
+            media : urls.PREFIX + '/' + media,
             private : user_data.private,
             reactions : user_data.reactions,
+            category : user_data.category,
             social_link  :user_data.social_link,
             streaks : user_data.streaks
         }
@@ -52,7 +59,7 @@ class ProfileScreen extends React.Component {
             if (!responseObj.error) {
                 const obj = responseObj.data[0];
                 new SessionStore().putValue(constants.USER_DATA, obj);
-                this.setData();
+                this.setData(obj);
             } else {
                 console.log(responseObj);
             }
@@ -98,6 +105,11 @@ class ProfileScreen extends React.Component {
                     <Text style={{fontSize : 18, color : '#333', margin : 10, textAlign : 'center', flexDirection : 'row'}}>
                         { channel_data.name}
                     </Text>
+                    <Text style={{fontSize : 14, color : '#999', marginTop : 0, margin : 10, textAlign : 'center', flexDirection : 'row'}}>
+                        {'('}
+                        {getCategoryName(channel_data.category)}
+                        {')'}
+                    </Text>
 
                     <View style={{flexDirection : 'row', justifyContent : 'center', marginTop : 10}}>
                         <View style={{justifyContent : 'center'}}>
@@ -126,15 +138,19 @@ class ProfileScreen extends React.Component {
                                 {channel_data.description}
                             </Text>
 
-                            <Text style={{fontSize : 12, color : '#555', textAlign : 'center', marginTop : 15, marginBottom : 0}}>
-                                {'Social Link'}
-                            </Text>
-
-                            <TouchableOpacity activeOpacity = {0.7} onPress = {()=>this.openSocialLink(channel_data.social_link)}>
-                                <Text numberOfLines = {1} lineBreakMode = 'tail' style={{fontSize : 15, color : '#444', textDecorationLine: 'underline', textAlign : 'center', marginTop : 10, marginBottom : 10, margin : 10}}>
-                                    {channel_data.social_link}
+                           { channel_data.social_link !== undefined && channel_data.social_link.length > 0 &&
+                            <View>
+                                <Text style={{fontSize : 12, color : '#555', textAlign : 'center', marginTop : 15, marginBottom : 0}}>
+                                    {'Social Link'}
                                 </Text>
-                            </TouchableOpacity>
+
+                                <TouchableOpacity activeOpacity = {0.7} onPress = {()=>this.openSocialLink(channel_data.social_link)}>
+                                    <Text numberOfLines = {1} lineBreakMode = 'tail' style={{fontSize : 15, color : '#444', textDecorationLine: 'underline', textAlign : 'center', marginTop : 10, marginBottom : 10, margin : 10}}>
+                                        {channel_data.social_link}
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                           }
                         </View>
                     </View>
                 </ScrollView>

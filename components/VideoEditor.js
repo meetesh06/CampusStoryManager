@@ -32,7 +32,6 @@ class VideoEditor extends React.Component {
         if (Platform.OS === "android") {
             NativeModules.MkaerVideoPicker.openPicker()
                 .then((data) => {
-                    // Alert.alert(JSON.stringify(data));
                     data = JSON.parse(data);
                     console.log(data);
                     Navigation.showModal({
@@ -75,18 +74,6 @@ class VideoEditor extends React.Component {
 
     completedEditing = (err, data) => {
         if (err) return;
-        // RNFetchBlob.fs.readStream(data, 'utf8')
-        //     .then((stream) => {
-        //         let data = ''
-        //         stream.open()
-        //         stream.onData((chunk) => {
-        //             data += chunk
-        //         })
-        //         stream.onEnd(() => {
-        //             console.log(data)
-        //         })
-        //     })
-        //     .catch(err => Alert.alert(JSON.stringify(err)))
         this.setState({videoURI: data});
     }
 

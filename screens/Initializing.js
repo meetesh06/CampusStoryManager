@@ -22,23 +22,16 @@ class App extends React.Component {
 
     UNSAFE_componentWillMount(){
         const val = new SessionStore().getValue(Constants.SET_UP_STATUS);
-        if(val === true){
-            // Realm.getRealm((realm)=>{
-            //     realm.write(async () => {
-            //       realm.deleteAll();
-            //       await new SessionStore().reset();
-            //       goInitializing();
-            //     });
-            //   });
+        if(val){
             goHome();
         }
     }
 
-    updataStatusAndToken = (token, data) => {
+    updataStatusAndToken = (token) => {
         const store = new SessionStore();
         store.putValue(Constants.TOKEN, token);
-        store.putValue(Constants.USER_DATA, data)
         store.putValue(Constants.SET_UP_STATUS, true);
+        store.putValue(Constants.IS_FIRST_TIME, true);
         store.setValueBulk();
 		goHome();
 	}
@@ -62,7 +55,7 @@ class App extends React.Component {
               console.log(result);
             if(!result.data.error){
                 this.setState({loading : false, error : ''}, ()=>{
-                    this.updataStatusAndToken(result.data.token, result.data.data);
+                    this.updataStatusAndToken(result.data.token);
                 });
             } else {
                 this.setState({error : 'Wrong UserID or Password', loading : false});

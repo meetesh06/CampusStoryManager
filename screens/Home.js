@@ -37,18 +37,40 @@ class Home extends React.Component {
     }
 
     refresh = () =>{
-        const data = new SessionStore().getValue(constants.USER_DATA);
-        this.setState({channel_data : data, refreshing : true});
-        this.fetchEvents((last_updated)=>{
-            this.queryLatestEvent(last_updated, ()=>{
-                this.queryLatestStories(()=>{
-                    this.fetchStories(()=>{
-                        this.readStories(()=>{
-                            this.setState({refreshing : false});
+        this.setState({refreshing : true});
+        this.fetchChannel(()=>{
+            this.fetchEvents((last_updated)=>{
+                this.queryLatestEvent(last_updated, ()=>{
+                    this.queryLatestStories(()=>{
+                        this.fetchStories(()=>{
+                            this.readStories(()=>{
+                                this.setState({refreshing : false});
+                            });
                         });
                     });
                 });
             });
+        });
+    }
+
+    fetchChannel = (callback) =>{
+        axios.post(urls.FETCH_CHANNEL_DATA, {}, {
+            headers: {
+            'x-access-token': new SessionStore().getValue(constants.TOKEN)
+            }
+        }).then((response) => {
+            const responseObj = response.data;
+            if (!responseObj.error) {
+                const obj = responseObj.data[0];
+                new SessionStore().putValue(constants.USER_DATA, obj);
+            } else {
+                console.log(responseObj);
+            }
+            callback();
+        })
+        .catch((err)=>{
+            console.log(err);
+            callback();
         });
     }
 
@@ -86,8 +108,7 @@ class Home extends React.Component {
     queryLatestStories = (callback) => {
         const formData = new FormData();
         const user_data = new SessionStore().getValue(constants.USER_DATA);
-        formData.append('channel_id', user_data.channel);
-
+        formData.append('channel_id', user_data._id);
         axios.post(urls.GET_STORY_URL, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
@@ -97,7 +118,6 @@ class Home extends React.Component {
             const responseObject = response.data;
             console.log(responseObject);
             if (!responseObject.error) {
-                // Alert.alert(JSON.stringify(responseObject.data.length));
                 Realm.getRealm((realm) => {
                     Object.entries(responseObject.data).forEach(([key, el] ) => {
                         el.reach = JSON.stringify(el.reach);
@@ -162,7 +182,6 @@ class Home extends React.Component {
                             try {
                                 realm.create('Events', data[i], true);
                             } catch(e) {
-                                //Alert.alert(JSON.stringify(e));
                                 console.log(e);
                             }
                         }
